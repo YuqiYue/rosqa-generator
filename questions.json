@@ -1,0 +1,149 @@
+[
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called main_camera?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called /camera/image_raw?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called /camera/info?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called /camera/set_exposure?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called /camera/get_info?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node main_camera publish to topic /camera/image_raw?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node main_camera subscribed to topic /camera/image_raw?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node main_camera publish to topic /camera/info?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node main_camera subscribed to topic /camera/info?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "To which topics can node main_camera publish?",
+    "answer": "/camera/image_raw"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "To which topics is node main_camera subscribed?",
+    "answer": "/camera/info"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node main_camera provide service /camera/set_exposure?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node main_camera use service /camera/set_exposure as a client?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node main_camera provide service /camera/get_info?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node main_camera use service /camera/get_info as a client?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services does node main_camera provide?",
+    "answer": "/camera/set_exposure"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services does node main_camera use as a client?",
+    "answer": "/camera/get_info"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE_TYPE",
+    "type": "OPEN",
+    "question": "What is the type of service /camera/set_exposure?",
+    "answer": "my_pkg/srv/SetExposure"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE_TYPE",
+    "type": "OPEN",
+    "question": "What is the type of service /camera/get_info?",
+    "answer": "my_pkg/srv/GetInfo"
+  },
+  {
+    "level": 1,
+    "category": "TOPIC_TYPE",
+    "type": "OPEN",
+    "question": "What is the type of topic /camera/image_raw?",
+    "answer": "sensor_msgs/msg/Image"
+  },
+  {
+    "level": 1,
+    "category": "TOPIC_TYPE",
+    "type": "OPEN",
+    "question": "What is the type of topic /camera/info?",
+    "answer": "sensor_msgs/msg/CameraInfo"
+  }
+]
