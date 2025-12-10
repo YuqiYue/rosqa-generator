@@ -1,12 +1,10 @@
 node type camera_node_type {
-    publishes to /camera/image_raw: sensor_msgs/msg/Image;
-    subscribes to /camera/info: sensor_msgs/msg/CameraInfo;
-    provides service /camera/set_exposure: my_pkg/srv/SetExposure;
-    uses service /camera/get_info: my_pkg/srv/GetInfo;
+    param frame_rate: double where {_ > 0.0 and _ <= 30.0};
+    publishes to camera/image_raw: sensor_msgs/Image;
 }
 
 system {
     node instance main_camera: camera_node_type {
-        # parameters could go here, we ignore them
+        param frame_rate = 15.0;  # Valid configuration
     }
 }

@@ -1,0 +1,20 @@
+node type hector_object_tracker_type {
+    param distance_to_obstacle_service: string;
+
+    subscribes to worldmodel/image_percept: hector_worldmodel_msgs/ImagePercept;
+    publishes to visualization_marker: visualization_msgs/Marker;
+    consumes service content(distance_to_obstacle_service): hector_nav_msgs/GetDistanceToObstacle;
+}
+
+node type hector_map_server_type {
+    provides service /hector_map_server/get_distance_to_obstacle: hector_nav_msgs/GetDistanceToObstacle;
+}
+
+system {
+    node instance hector_object_tracker: hector_object_tracker_type {
+        param distance_to_obstacle_service = "get_distance_to_obstacle";
+    }
+    node instance hector_map_server: hector_map_server_type {
+        remap /hector_map_server/get_distance_to_obstacle to get_distance_to_obstacle;
+    }
+}
