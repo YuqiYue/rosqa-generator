@@ -46,7 +46,7 @@ def _bool_yes_no(value: bool) -> str:
     return "Yes" if value else "No"
 
 
-# ---------- Step 3.1: fake entities ----------
+# ---------- fake entities ----------
 
 def _generate_fake_entities(real_names: List[str], count: int = 5) -> List[str]:
     """
@@ -88,7 +88,7 @@ def _entity_kind(name: str, graph: Graph) -> str:
     return "3"
 
 
-# ---------- Step 3.3: communication path (Level 2) ----------
+# ---------- communication path (Level 2) ----------
 
 def _build_adjacency(graph: Graph) -> Dict[str, Set[str]]:
     """
