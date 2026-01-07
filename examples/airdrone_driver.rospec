@@ -1,0 +1,30 @@
+node type airdrone_driver {
+    expects param altitude_max:int where {_>=0} = 2;
+    expects param altitude_min:int where {_>=0} = 1;
+
+    ensures publishes to /front/image_raw;
+} where {
+    altitude_max >= altitude_min;
+    tag(/front/image_raw, "COLOR") == "rgb8";
+}
+
+topic type /front/image_raw : sensor_msgs/Image {
+    tag(/front/image_raw, "COLOR") = "rgb8";
+}
+
+system {
+    node instance driver : airdrone_driver {
+        ensures param altitude_max:int where {_>=0}=2;
+        ensures param altitude_min:int where{_>=0}=1;
+    }
+    
+    node type object_detector {
+        expects subscribes to /front/image_raw;
+    } where {
+        tag(/front/image_raw, "COLOR") == "gray";
+    }
+    
+    node instance detector : object_detector {
+        ensures subscribes to /front/image_raw;
+    }
+}

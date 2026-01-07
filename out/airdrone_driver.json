@@ -1,0 +1,163 @@
+[
+  {
+    "level": 1,
+    "category": "NODE_TYPE",
+    "type": "BOOL",
+    "question": "Is there a ROSpec node type called airdrone_driver?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "Which parameters are defined in node type airdrone_driver?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT",
+    "type": "OPEN",
+    "question": "Which contexts are defined in node type airdrone_driver?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which QoS policy tags are attached in node type airdrone_driver?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which non-QoS attachments are declared in node type airdrone_driver?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which topics can node type airdrone_driver publish to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which topics can node type airdrone_driver subscribe to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services can node type airdrone_driver provide (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services can node type airdrone_driver use (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does node type airdrone_driver declare a where-clause?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "TF",
+    "type": "OPEN",
+    "question": "What TF relations are declared in node type airdrone_driver?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "NODE_TYPE",
+    "type": "BOOL",
+    "question": "Is there a ROSpec node type called object_detector?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "Which parameters are defined in node type object_detector?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT",
+    "type": "OPEN",
+    "question": "Which contexts are defined in node type object_detector?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which QoS policy tags are attached in node type object_detector?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which non-QoS attachments are declared in node type object_detector?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which topics can node type object_detector publish to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which topics can node type object_detector subscribe to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services can node type object_detector provide (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services can node type object_detector use (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does node type object_detector declare a where-clause?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "OPEN",
+    "question": "What is the where-clause of node type object_detector?",
+    "answer": "tag(/front/image_raw, \"COLOR\") == \"gray\";"
+  },
+  {
+    "level": 1,
+    "category": "TF",
+    "type": "OPEN",
+    "question": "What TF relations are declared in node type object_detector?",
+    "answer": "None"
+  }
+]

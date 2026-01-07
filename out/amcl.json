@@ -1,0 +1,324 @@
+[
+  {
+    "level": 1,
+    "category": "NODE_TYPE",
+    "type": "BOOL",
+    "question": "Is there a ROSpec node type called amcl_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "Which parameters are defined in node type amcl_type?",
+    "answer": "always_reset_initial_pose, laser_model_type, map_topic_name, scan_topic_name, z_hit, z_max, z_rand, z_short"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter scan_topic_name in node type amcl_type?",
+    "answer": "string"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter scan_topic_name optional in node type amcl_type?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter scan_topic_name in node type amcl_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter scan_topic_name in node type amcl_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter map_topic_name in node type amcl_type?",
+    "answer": "string"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter map_topic_name optional in node type amcl_type?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter map_topic_name in node type amcl_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter map_topic_name in node type amcl_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter z_hit in node type amcl_type?",
+    "answer": "double"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter z_hit optional in node type amcl_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter z_hit in node type amcl_type?",
+    "answer": "0.5"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter z_hit in node type amcl_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter z_max in node type amcl_type?",
+    "answer": "double"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter z_max optional in node type amcl_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter z_max in node type amcl_type?",
+    "answer": "0.05"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter z_max in node type amcl_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter z_rand in node type amcl_type?",
+    "answer": "double"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter z_rand optional in node type amcl_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter z_rand in node type amcl_type?",
+    "answer": "0.5"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter z_rand in node type amcl_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter z_short in node type amcl_type?",
+    "answer": "double"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter z_short optional in node type amcl_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter z_short in node type amcl_type?",
+    "answer": "0.005"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter z_short in node type amcl_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter always_reset_initial_pose in node type amcl_type?",
+    "answer": "bool"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter always_reset_initial_pose optional in node type amcl_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter always_reset_initial_pose in node type amcl_type?",
+    "answer": "false"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter always_reset_initial_pose in node type amcl_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter laser_model_type in node type amcl_type?",
+    "answer": "LaserModelType"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter laser_model_type optional in node type amcl_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter laser_model_type in node type amcl_type?",
+    "answer": "LikelihoodField"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter laser_model_type in node type amcl_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT",
+    "type": "OPEN",
+    "question": "Which contexts are defined in node type amcl_type?",
+    "answer": "distribution"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT",
+    "type": "OPEN",
+    "question": "What is the type of context distribution in node type amcl_type?",
+    "answer": "AfterHumbleVersion"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which QoS policy tags are attached in node type amcl_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which non-QoS attachments are declared in node type amcl_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which topics can node type amcl_type publish to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which topics can node type amcl_type subscribe to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services can node type amcl_type provide (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services can node type amcl_type use (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does node type amcl_type declare a where-clause?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "TF",
+    "type": "OPEN",
+    "question": "What TF relations are declared in node type amcl_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "TYPE_ALIAS",
+    "type": "BOOL",
+    "question": "Is there a type alias called LaserModelType?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "TYPE_ALIAS",
+    "type": "OPEN",
+    "question": "What is the definition of type alias LaserModelType?",
+    "answer": "Enum[Beam, LikelihoodField, LikelihoodFieldProb]"
+  }
+]

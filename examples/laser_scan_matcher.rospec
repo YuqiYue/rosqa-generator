@@ -1,0 +1,15 @@
+node type laser_scan_matcher_type {
+    context is_simulation: bool;
+    optional param use_sim_time: bool = false;
+
+    broadcast world to base_link;
+    listens base_link to laser;
+} where {
+    is_simulation -> use_sim_time;
+}
+
+system {
+    node instance laser_scan_matcher: laser_scan_matcher_type {
+        context is_simulation = true;
+    }
+}

@@ -1,0 +1,121 @@
+[
+  {
+    "level": 1,
+    "category": "NODE_TYPE",
+    "type": "BOOL",
+    "question": "Is there a ROSpec node type called laser_scan_matcher_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "Which parameters are defined in node type laser_scan_matcher_type?",
+    "answer": "use_sim_time"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter use_sim_time in node type laser_scan_matcher_type?",
+    "answer": "bool"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter use_sim_time optional in node type laser_scan_matcher_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter use_sim_time in node type laser_scan_matcher_type?",
+    "answer": "false"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter use_sim_time in node type laser_scan_matcher_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT",
+    "type": "OPEN",
+    "question": "Which contexts are defined in node type laser_scan_matcher_type?",
+    "answer": "is_simulation"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT",
+    "type": "OPEN",
+    "question": "What is the type of context is_simulation in node type laser_scan_matcher_type?",
+    "answer": "bool"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which QoS policy tags are attached in node type laser_scan_matcher_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which non-QoS attachments are declared in node type laser_scan_matcher_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which topics can node type laser_scan_matcher_type publish to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which topics can node type laser_scan_matcher_type subscribe to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services can node type laser_scan_matcher_type provide (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services can node type laser_scan_matcher_type use (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does node type laser_scan_matcher_type declare a where-clause?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "OPEN",
+    "question": "What is the where-clause of node type laser_scan_matcher_type?",
+    "answer": "is_simulation -> use_sim_time;"
+  },
+  {
+    "level": 1,
+    "category": "TF",
+    "type": "OPEN",
+    "question": "What TF relations are declared in node type laser_scan_matcher_type?",
+    "answer": "broadcast world->base_link, listens base_link->laser"
+  }
+]

@@ -1,0 +1,10 @@
+node type arm_kinematics_constraint_aware_type {
+    param group: Plugin;
+    }
+
+plugin type right_arm_type {
+    param tip_name: string;
+    param root_name: string;
+    optional param robot_description: string = "robot_description";
+    optional param tf_safety_timeout: Second = 0.0;
+}

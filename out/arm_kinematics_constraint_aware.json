@@ -1,0 +1,107 @@
+[
+  {
+    "level": 1,
+    "category": "NODE_TYPE",
+    "type": "BOOL",
+    "question": "Is there a ROSpec node type called arm_kinematics_constraint_aware_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "Which parameters are defined in node type arm_kinematics_constraint_aware_type?",
+    "answer": "group"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter group in node type arm_kinematics_constraint_aware_type?",
+    "answer": "Plugin"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter group optional in node type arm_kinematics_constraint_aware_type?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter group in node type arm_kinematics_constraint_aware_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter group in node type arm_kinematics_constraint_aware_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT",
+    "type": "OPEN",
+    "question": "Which contexts are defined in node type arm_kinematics_constraint_aware_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which QoS policy tags are attached in node type arm_kinematics_constraint_aware_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which non-QoS attachments are declared in node type arm_kinematics_constraint_aware_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which topics can node type arm_kinematics_constraint_aware_type publish to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which topics can node type arm_kinematics_constraint_aware_type subscribe to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services can node type arm_kinematics_constraint_aware_type provide (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services can node type arm_kinematics_constraint_aware_type use (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does node type arm_kinematics_constraint_aware_type declare a where-clause?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "TF",
+    "type": "OPEN",
+    "question": "What TF relations are declared in node type arm_kinematics_constraint_aware_type?",
+    "answer": "None"
+  }
+]

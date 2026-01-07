@@ -1,0 +1,22 @@
+policy instance best_effort_qos5: qos {
+    setting depth = 5;
+    setting reliability = BestEffort;
+}
+
+node type openni_camera_driver_depth_type {
+    optional param depth_registration: bool = true;
+    @qos{best_effort_qos5}
+    @color_format{Grayscale}
+    publishes to /camera/rgb/image_raw: sensor_msgs/Image;
+}
+
+node type custom_node_type {
+    @qos{reliable_qos5}
+    @color_format{RGB8}
+    subscribes to /camera/rgb/image_raw: sensor_msgs/Image;
+}
+
+system {
+    node instance custom_node: custom_node_type { }
+    node instance openni_camera_driver: openni_camera_driver_depth_type { }
+}

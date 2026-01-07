@@ -1,0 +1,219 @@
+[
+  {
+    "level": 1,
+    "category": "NODE_TYPE",
+    "type": "BOOL",
+    "question": "Is there a ROSpec node type called openni_camera_driver_depth_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "Which parameters are defined in node type openni_camera_driver_depth_type?",
+    "answer": "depth_registration"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter depth_registration in node type openni_camera_driver_depth_type?",
+    "answer": "bool"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter depth_registration optional in node type openni_camera_driver_depth_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter depth_registration in node type openni_camera_driver_depth_type?",
+    "answer": "true"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter depth_registration in node type openni_camera_driver_depth_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT",
+    "type": "OPEN",
+    "question": "Which contexts are defined in node type openni_camera_driver_depth_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which QoS policy tags are attached in node type openni_camera_driver_depth_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which non-QoS attachments are declared in node type openni_camera_driver_depth_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which topics can node type openni_camera_driver_depth_type publish to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which topics can node type openni_camera_driver_depth_type subscribe to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services can node type openni_camera_driver_depth_type provide (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services can node type openni_camera_driver_depth_type use (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does node type openni_camera_driver_depth_type declare a where-clause?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "TF",
+    "type": "OPEN",
+    "question": "What TF relations are declared in node type openni_camera_driver_depth_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "NODE_TYPE",
+    "type": "BOOL",
+    "question": "Is there a ROSpec node type called custom_node_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "Which parameters are defined in node type custom_node_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT",
+    "type": "OPEN",
+    "question": "Which contexts are defined in node type custom_node_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which QoS policy tags are attached in node type custom_node_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which non-QoS attachments are declared in node type custom_node_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which topics can node type custom_node_type publish to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which topics can node type custom_node_type subscribe to (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services can node type custom_node_type provide (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services can node type custom_node_type use (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does node type custom_node_type declare a where-clause?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "TF",
+    "type": "OPEN",
+    "question": "What TF relations are declared in node type custom_node_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "POLICY",
+    "type": "BOOL",
+    "question": "Is there a policy instance called best_effort_qos5?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "POLICY",
+    "type": "OPEN",
+    "question": "What is the kind of policy instance best_effort_qos5?",
+    "answer": "qos"
+  },
+  {
+    "level": 1,
+    "category": "POLICY",
+    "type": "OPEN",
+    "question": "What settings are defined in policy instance best_effort_qos5?",
+    "answer": "depth=5, reliability=BestEffort"
+  },
+  {
+    "level": 1,
+    "category": "POLICY",
+    "type": "OPEN",
+    "question": "What is the value of setting depth in policy instance best_effort_qos5?",
+    "answer": "5"
+  },
+  {
+    "level": 1,
+    "category": "POLICY",
+    "type": "OPEN",
+    "question": "What is the value of setting reliability in policy instance best_effort_qos5?",
+    "answer": "BestEffort"
+  }
+]

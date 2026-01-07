@@ -1,79 +1,79 @@
 [
   {
-    "level": 0,
-    "category": "ENTITY",
+    "level": 1,
+    "category": "NODE_TYPE",
     "type": "BOOL",
-    "question": "Is there a ROS2 entity called move_group_xap?",
-    "answer": "No"
-  },
-  {
-    "level": 0,
-    "category": "ENTITY",
-    "type": "BOOL",
-    "question": "Is there a ROS2 entity called move_group_xgy?",
-    "answer": "No"
-  },
-  {
-    "level": 0,
-    "category": "ENTITY",
-    "type": "BOOL",
-    "question": "Is there a ROS2 entity called move_group_xiy?",
-    "answer": "No"
-  },
-  {
-    "level": 0,
-    "category": "ENTITY",
-    "type": "BOOL",
-    "question": "Is there a ROS2 entity called move_group_xpv?",
-    "answer": "No"
-  },
-  {
-    "level": 0,
-    "category": "ENTITY",
-    "type": "BOOL",
-    "question": "Is there a ROS2 entity called move_group_xth?",
-    "answer": "No"
-  },
-  {
-    "level": 0,
-    "category": "ENTITY",
-    "type": "BOOL",
-    "question": "Is there a ROS2 entity called move_group?",
+    "question": "Is there a ROSpec node type called move_group_type?",
     "answer": "Yes"
   },
   {
-    "level": 0,
-    "category": "ENTITY",
-    "type": "MCQ",
-    "question": "What kind of ROS2 entity is move_group? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
-    "answer": "3"
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "Which parameters are defined in node type move_group_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT",
+    "type": "OPEN",
+    "question": "Which contexts are defined in node type move_group_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which QoS policy tags are attached in node type move_group_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "Which non-QoS attachments are declared in node type move_group_type?",
+    "answer": "None"
   },
   {
     "level": 1,
     "category": "PUBLISH",
     "type": "OPEN",
-    "question": "To which topics can node move_group publish?",
+    "question": "Which topics can node type move_group_type publish to (as declared)?",
     "answer": "None"
   },
   {
     "level": 1,
     "category": "SUBSCRIBE",
     "type": "OPEN",
-    "question": "To which topics is node move_group subscribed?",
+    "question": "Which topics can node type move_group_type subscribe to (as declared)?",
     "answer": "None"
   },
   {
     "level": 1,
     "category": "SERVICE",
     "type": "OPEN",
-    "question": "Which services does node move_group provide?",
+    "question": "Which services can node type move_group_type provide (as declared)?",
     "answer": "None"
   },
   {
     "level": 1,
     "category": "CLIENT",
     "type": "OPEN",
-    "question": "Which services does node move_group use as a client?",
+    "question": "Which services can node type move_group_type use (as declared)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does node type move_group_type declare a where-clause?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "TF",
+    "type": "OPEN",
+    "question": "What TF relations are declared in node type move_group_type?",
     "answer": "None"
   }
 ]
