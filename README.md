@@ -128,11 +128,13 @@ The output is a JSON array. Each entry has the following structure:
 
 
 ## Project structure
+```text
 src/rosqa/
 ├── cli.py              # Command-line interface
 ├── model.py            # Graph and entity data structures
 ├── rospec_loader.py    # ROSpec parser
 ├── questions.py        # Question generation logic
+```
 
 ## Status
 The current implementation supports all entities and relations present in the ROSpec examples, including dynamic content(...) services, parameter constraints, QoS policies, TF relations, and remapping semantics.
