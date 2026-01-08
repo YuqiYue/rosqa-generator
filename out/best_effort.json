@@ -99,6 +99,13 @@
   },
   {
     "level": 1,
+    "category": "WHERE",
+    "type": "OPEN",
+    "question": "What is the where-clause of node type openni_camera_driver_depth_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
     "category": "TF",
     "type": "OPEN",
     "question": "What TF relations are declared in node type openni_camera_driver_depth_type?",
@@ -173,6 +180,13 @@
     "type": "BOOL",
     "question": "Does node type custom_node_type declare a where-clause?",
     "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "OPEN",
+    "question": "What is the where-clause of node type custom_node_type?",
+    "answer": "None"
   },
   {
     "level": 1,

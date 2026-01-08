@@ -8,3 +8,6 @@ dependencies = []
 
 [project.scripts]
 rosqa = "rosqa.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -3,35 +3,35 @@
     "level": 0,
     "category": "ENTITY",
     "type": "BOOL",
-    "question": "Is there a ROS2 entity called visualization_marker_xka?",
+    "question": "Is there a ROS2 entity called /hector_map_server/get_distance_to_obstacle_xcy?",
     "answer": "No"
   },
   {
     "level": 0,
     "category": "ENTITY",
     "type": "BOOL",
-    "question": "Is there a ROS2 entity called visualization_marker_xph?",
+    "question": "Is there a ROS2 entity called visualization_marker_xeu?",
     "answer": "No"
   },
   {
     "level": 0,
     "category": "ENTITY",
     "type": "BOOL",
-    "question": "Is there a ROS2 entity called worldmodel/image_percept_xch?",
+    "question": "Is there a ROS2 entity called visualization_marker_xol?",
     "answer": "No"
   },
   {
     "level": 0,
     "category": "ENTITY",
     "type": "BOOL",
-    "question": "Is there a ROS2 entity called worldmodel/image_percept_xrs?",
+    "question": "Is there a ROS2 entity called visualization_marker_xsx?",
     "answer": "No"
   },
   {
     "level": 0,
     "category": "ENTITY",
     "type": "BOOL",
-    "question": "Is there a ROS2 entity called worldmodel/image_percept_xtk?",
+    "question": "Is there a ROS2 entity called worldmodel/image_percept_xhl?",
     "answer": "No"
   },
   {
@@ -176,6 +176,13 @@
   },
   {
     "level": 1,
+    "category": "WHERE",
+    "type": "OPEN",
+    "question": "What is the where-clause of node type hector_object_tracker_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
     "category": "CONTENT_SERVICE",
     "type": "OPEN",
     "question": "Which parameter provides the consumed service name via content(...) in node type hector_object_tracker_type?",
@@ -264,6 +271,13 @@
     "type": "BOOL",
     "question": "Does node type hector_map_server_type declare a where-clause?",
     "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "OPEN",
+    "question": "What is the where-clause of node type hector_map_server_type?",
+    "answer": "None"
   },
   {
     "level": 1,

@@ -8,19 +8,37 @@ from .rospec_loader import load_graph_from_rospec
 from .questions import generate_questions
 
 
-def main(argv: list[str] | None = None) -> None:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Generate comprehension questions from a rospec specification."
+        description="Generate comprehension questions from a ROSpec specification."
     )
     parser.add_argument("rospec", type=Path, help="Input .rospec file")
     parser.add_argument(
-        "-o", "--output", type=Path, default=Path("questions.json"),
+        "-o",
+        "--output",
+        type=Path,
+        default=Path("questions.json"),
         help="Output JSON file (default: questions.json)",
+    )
+    parser.add_argument(
+        "--no-negative-entities",
+        action="store_true",
+        help="Disable generation of negative (non-existent) entity questions.",
+    )
+    parser.add_argument(
+        "--negative-count",
+        type=int,
+        default=5,
+        help="Number of negative entities to generate per file (default: 5).",
     )
     args = parser.parse_args(argv)
 
     graph = load_graph_from_rospec(args.rospec)
-    questions = generate_questions(graph)
+    questions = generate_questions(
+        graph,
+        include_negative_entities=not args.no_negative_entities,
+        negative_entities_per_file=max(0, args.negative_count),
+    )
 
     payload = [
         {
@@ -33,4 +51,11 @@ def main(argv: list[str] | None = None) -> None:
         for q in questions
     ]
 
-    args.output.write_text(json.dumps(payload, indent=2))
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

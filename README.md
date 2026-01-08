@@ -35,7 +35,7 @@ All answers are deterministically derived from the ROSpec input. No runtime ROS 
 Clone the repository and install it in editable mode:
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/YuqiYue/rosqa-generator.git
 cd rosqa-generator
 python -m venv venv
 source venv/bin/activate
@@ -136,5 +136,55 @@ src/rosqa/
 ├── questions.py        # Question generation logic
 ```
 
-## Status
-The current implementation supports all entities and relations present in the ROSpec examples, including dynamic content(...) services, parameter constraints, QoS policies, TF relations, and remapping semantics.
+## Programmatic usage as a Python library
+
+In addition to the CLI, **rosqa-generator** can be used directly as a Python library.  
+This is useful if you want to integrate question generation into another analysis tool,
+a pipeline, or a research prototype.
+
+After installing the package in editable or normal mode:
+
+```bash
+pip install -e .
+```
+you can import and use the core APIs as follows.
+
+### Basic usage
+```python
+from pathlib import Path
+from rosqa.rospec_loader import load_graph_from_rospec
+from rosqa.questions import generate_questions
+
+# Load a ROSpec file into an internal graph model
+graph = load_graph_from_rospec(Path("examples/laser_scan_matcher.rospec"))
+
+# Generate all questions
+questions = generate_questions(graph)
+
+# Inspect questions
+for q in questions[:5]:
+    print(q.level, q.category, q.question, "=>", q.answer)
+```
+
+Each element in `questions` is a `Question` dataclass with the following attributes:
+
+- **level**: abstraction level (`ENTITY`, `RELATION`, `PATH`)
+- **category**: semantic category (e.g., `PARAMETER`, `SERVICE`, `CONTENT_SERVICE`)
+- **qtype**: question type (`BOOL`, `MCQ`, `OPEN`)
+- **question**: natural-language question
+- **answer**: ground-truth answer derived from the ROSpec
+
+### Customizing generation
+The generator exposes optional parameters to control its behavior:
+
+```python
+questions = generate_questions(
+    graph,
+    include_negative_entities=True,
+    negative_entities_per_file=5,
+)
+```
+
+This allows you to:
+- enable or disable negative (non-existent) entity questions
+- control how many negative entities are generated per specification

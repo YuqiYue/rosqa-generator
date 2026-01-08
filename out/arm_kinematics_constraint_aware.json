@@ -99,6 +99,13 @@
   },
   {
     "level": 1,
+    "category": "WHERE",
+    "type": "OPEN",
+    "question": "What is the where-clause of node type arm_kinematics_constraint_aware_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
     "category": "TF",
     "type": "OPEN",
     "question": "What TF relations are declared in node type arm_kinematics_constraint_aware_type?",

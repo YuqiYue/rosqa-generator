@@ -2,6 +2,7 @@ README.md
 pyproject.toml
 src/rosqa/__init__.py
 src/rosqa/cli.py
+src/rosqa/io.py
 src/rosqa/model.py
 src/rosqa/questions.py
 src/rosqa/rospec_loader.py
@@ -10,3 +11,4 @@ src/rosqa.egg-info/SOURCES.txt
 src/rosqa.egg-info/dependency_links.txt
 src/rosqa.egg-info/entry_points.txt
 src/rosqa.egg-info/top_level.txt
+test/test_library_api.py

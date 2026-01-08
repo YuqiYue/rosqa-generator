@@ -76,12 +76,42 @@ def _strip_quotes(s: str) -> str:
     return s
 
 
+def _open_empty() -> str:
+    # For “no items exist / empty set / not declared”
+    return "None"
+
+
+def _open_unknown() -> str:
+    # For “should exist but could not be inferred / not parsed”
+    return "Unknown"
+
+
 def _comma_list(items: Iterable[str]) -> str:
-    items = [x for x in items if x]
-    return ", ".join(sorted(set(items))) if items else "None"
+    xs = [x for x in items if x]
+    xs = sorted(set(xs))
+    return ", ".join(xs) if xs else _open_empty()
 
 
+def _opt_empty(x: Optional[str]) -> str:
+    # For optional blocks that may legitimately be absent
+    if x is None:
+        return _open_empty()
+    x = str(x).strip()
+    return x if x else _open_empty()
+
+
+def _opt_unknown(x: Optional[str]) -> str:
+    # For fields that likely should be known (e.g. type) but may be missing
+    if x is None:
+        return _open_unknown()
+    x = str(x).strip()
+    return x if x else _open_unknown()
+
+
+# -----------------------
 # content(param_name) handling
+# -----------------------
+
 _CONTENT_RE = re.compile(r"^content\((?P<param>\w+)\)$")
 
 
@@ -98,7 +128,7 @@ def _resolve_content_name(raw_name: str, node) -> str:
     param = _maybe_content_param(raw_name)
     if not param:
         return raw_name
-    assigns = getattr(node, "param_assigns", {})
+    assigns = getattr(node, "param_assigns", {}) or {}
     if param in assigns:
         return _strip_quotes(assigns[param].value)
     # Unresolved: keep original so questions still make sense
@@ -123,7 +153,7 @@ def _entity_kind(name: str, graph: Graph) -> str:
 def _generate_fake_entities(real_names: List[str], count: int = 5) -> List[str]:
     base = set(real_names)
     fake: Set[str] = set()
-    if not real_names:
+    if not real_names or count <= 0:
         return []
 
     attempts = 0
@@ -146,15 +176,15 @@ def _apply_remaps(name: str, node) -> str:
     """
     Apply instance remaps (A->B) if the exact name matches a remap 'frm'.
     """
-    for r in getattr(node, "remaps", []):
+    for r in getattr(node, "remaps", []) or []:
         if r.frm == name:
             return r.to
     return name
 
 
 def _effective_publishes(node) -> Set[str]:
-    names = []
-    for (raw, _typ) in getattr(node.node_type, "publishes", set()):
+    names: List[str] = []
+    for (raw, _typ) in getattr(node.node_type, "publishes", set()) or set():
         resolved = _resolve_content_name(raw, node)
         resolved = _apply_remaps(resolved, node)
         names.append(resolved)
@@ -162,8 +192,8 @@ def _effective_publishes(node) -> Set[str]:
 
 
 def _effective_subscribes(node) -> Set[str]:
-    names = []
-    for (raw, _typ) in getattr(node.node_type, "subscribes", set()):
+    names: List[str] = []
+    for (raw, _typ) in getattr(node.node_type, "subscribes", set()) or set():
         resolved = _resolve_content_name(raw, node)
         resolved = _apply_remaps(resolved, node)
         names.append(resolved)
@@ -171,8 +201,8 @@ def _effective_subscribes(node) -> Set[str]:
 
 
 def _effective_provides(node) -> Set[str]:
-    names = []
-    for (srv, _typ) in getattr(node.node_type, "provides", set()):
+    names: List[str] = []
+    for (srv, _typ) in getattr(node.node_type, "provides", set()) or set():
         resolved = _resolve_content_name(srv, node)
         resolved = _apply_remaps(resolved, node)
         names.append(resolved)
@@ -182,16 +212,17 @@ def _effective_provides(node) -> Set[str]:
 def _effective_uses(node) -> Set[str]:
     """
     Explicit uses service X: T; plus content-based consumes service content(param): T;
-    Your loader stores consumes_content_services as tuples ("<content>", param_name, srv_type).
+    Loader stores consumes_content_services as tuples ("<content>", param_name, srv_type).
     """
     names: List[str] = []
-    for (srv, _typ) in getattr(node.node_type, "uses", set()):
+
+    for (srv, _typ) in getattr(node.node_type, "uses", set()) or set():
         resolved = _resolve_content_name(srv, node)
         resolved = _apply_remaps(resolved, node)
         names.append(resolved)
 
-    for (_placeholder, param_name, _srv_type) in getattr(node.node_type, "consumes_content_services", set()):
-        assigns = getattr(node, "param_assigns", {})
+    for (_placeholder, param_name, _srv_type) in getattr(node.node_type, "consumes_content_services", set()) or set():
+        assigns = getattr(node, "param_assigns", {}) or {}
         if param_name in assigns:
             resolved = _strip_quotes(assigns[param_name].value)
             resolved = _apply_remaps(resolved, node)
@@ -208,8 +239,8 @@ def _effective_uses(node) -> Set[str]:
 # -----------------------
 
 def _build_adjacency(graph: Graph) -> Dict[str, Set[str]]:
-    adj: Dict[str, Set[str]] = {name: set() for name in graph.nodes}
-    nodes = list(graph.nodes.values())
+    adj: Dict[str, Set[str]] = {name: set() for name in getattr(graph, "nodes", {})}
+    nodes = list(getattr(graph, "nodes", {}).values())
 
     # Topic edges: publisher -> subscriber
     for src in nodes:
@@ -249,7 +280,7 @@ def _has_communication_path(src: str, dst: str, graph: Graph) -> bool:
 
     while q:
         cur = q.popleft()
-        for nxt in adj.get(cur, ()):
+        for nxt in adj.get(cur, set()):
             if nxt == dst:
                 return True
             if nxt not in visited:
@@ -331,7 +362,7 @@ def generate_questions(
         ))
 
         # Parameters (defs)
-        param_defs = getattr(nt, "parameters", {})
+        param_defs = getattr(nt, "parameters", {}) or {}
         qs.append(Question(
             level=Level.RELATION,
             category=Category.PARAMETER,
@@ -346,7 +377,7 @@ def generate_questions(
                 category=Category.PARAMETER,
                 qtype=QType.OPEN,
                 question=f"What is the type of parameter {p.name} in node type {nt.name}?",
-                answer=str(p.type),
+                answer=_opt_unknown(getattr(p, "type", None)),
             ))
             qs.append(Question(
                 level=Level.RELATION,
@@ -361,7 +392,7 @@ def generate_questions(
                 category=Category.PARAMETER,
                 qtype=QType.OPEN,
                 question=f"What is the default value of parameter {p.name} in node type {nt.name}?",
-                answer=str(default) if default is not None else "None",
+                answer=_opt_empty(str(default)) if default is not None else _open_empty(),
             ))
             constraint = getattr(p, "constraint", None)
             qs.append(Question(
@@ -377,11 +408,11 @@ def generate_questions(
                     category=Category.WHERE,
                     qtype=QType.OPEN,
                     question=f"What is the constraint of parameter {p.name} in node type {nt.name}?",
-                    answer=str(constraint).strip(),
+                    answer=str(constraint).strip() or _open_empty(),
                 ))
 
         # Contexts (defs)
-        ctx_defs = getattr(nt, "contexts", {})
+        ctx_defs = getattr(nt, "contexts", {}) or {}
         qs.append(Question(
             level=Level.RELATION,
             category=Category.CONTEXT,
@@ -395,12 +426,12 @@ def generate_questions(
                 category=Category.CONTEXT,
                 qtype=QType.OPEN,
                 question=f"What is the type of context {c.name} in node type {nt.name}?",
-                answer=str(c.type),
+                answer=_opt_unknown(getattr(c, "type", None)),
             ))
 
         # Attachments (qos + other)
-        qos_att = sorted(getattr(nt, "qos_attachments", set()))
-        other_att = getattr(nt, "other_attachments", {})  # dict key->value
+        qos_att = sorted(getattr(nt, "qos_attachments", set()) or set())
+        other_att = getattr(nt, "other_attachments", {}) or {}
 
         qs.append(Question(
             level=Level.RELATION,
@@ -414,7 +445,7 @@ def generate_questions(
             category=Category.ATTACHMENT,
             qtype=QType.OPEN,
             question=f"Which non-QoS attachments are declared in node type {nt.name}?",
-            answer=_comma_list([f"{k}={v}" for k, v in other_att.items()]) if other_att else "None",
+            answer=_comma_list([f"{k}={v}" for k, v in other_att.items()]),
         ))
         for k, v in other_att.items():
             qs.append(Question(
@@ -422,30 +453,46 @@ def generate_questions(
                 category=Category.ATTACHMENT,
                 qtype=QType.OPEN,
                 question=f"What is the value of attachment @{k} in node type {nt.name}?",
-                answer=str(v),
+                answer=str(v).strip() or _open_empty(),
             ))
 
         # Connections declared at type level (raw names, may include content(...))
-        pubs = [name for (name, _t) in getattr(nt, "publishes", set())]
-        subs = [name for (name, _t) in getattr(nt, "subscribes", set())]
-        prov = [name for (name, _t) in getattr(nt, "provides", set())]
-        uses = [name for (name, _t) in getattr(nt, "uses", set())]
-        consumes_content = list(getattr(nt, "consumes_content_services", set()))
+        pubs = [name for (name, _t) in (getattr(nt, "publishes", set()) or set())]
+        subs = [name for (name, _t) in (getattr(nt, "subscribes", set()) or set())]
+        prov = [name for (name, _t) in (getattr(nt, "provides", set()) or set())]
+        uses = [name for (name, _t) in (getattr(nt, "uses", set()) or set())]
+        consumes_content = list(getattr(nt, "consumes_content_services", set()) or set())
 
-        qs.append(Question(Level.RELATION, Category.PUBLISH, QType.OPEN,
-                          f"Which topics can node type {nt.name} publish to (as declared)?",
-                          _comma_list(pubs)))
-        qs.append(Question(Level.RELATION, Category.SUBSCRIBE, QType.OPEN,
-                          f"Which topics can node type {nt.name} subscribe to (as declared)?",
-                          _comma_list(subs)))
-        qs.append(Question(Level.RELATION, Category.SERVICE, QType.OPEN,
-                          f"Which services can node type {nt.name} provide (as declared)?",
-                          _comma_list(prov)))
-        qs.append(Question(Level.RELATION, Category.CLIENT, QType.OPEN,
-                          f"Which services can node type {nt.name} use (as declared)?",
-                          _comma_list(uses)))
+        qs.append(Question(
+            Level.RELATION,
+            Category.PUBLISH,
+            QType.OPEN,
+            f"Which topics can node type {nt.name} publish to (as declared)?",
+            _comma_list(pubs),
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.SUBSCRIBE,
+            QType.OPEN,
+            f"Which topics can node type {nt.name} subscribe to (as declared)?",
+            _comma_list(subs),
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.SERVICE,
+            QType.OPEN,
+            f"Which services can node type {nt.name} provide (as declared)?",
+            _comma_list(prov),
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.CLIENT,
+            QType.OPEN,
+            f"Which services can node type {nt.name} use (as declared)?",
+            _comma_list(uses),
+        ))
 
-        # where block at end of node type
+        # where block at end of node type (optional)
         where_block = getattr(nt, "where_block", None)
         qs.append(Question(
             level=Level.RELATION,
@@ -454,35 +501,33 @@ def generate_questions(
             question=f"Does node type {nt.name} declare a where-clause?",
             answer=_bool_yes_no(bool(where_block)),
         ))
-        if where_block:
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.WHERE,
-                qtype=QType.OPEN,
-                question=f"What is the where-clause of node type {nt.name}?",
-                answer=str(where_block).strip(),
-            ))
+        qs.append(Question(
+            level=Level.RELATION,
+            category=Category.WHERE,
+            qtype=QType.OPEN,
+            question=f"What is the where-clause of node type {nt.name}?",
+            answer=_opt_empty(where_block),
+        ))
 
         # content(service_param) declarations (unresolved until instance time)
-        if consumes_content:
-            for (_ph, param_name, srv_type) in consumes_content:
-                qs.append(Question(
-                    level=Level.RELATION,
-                    category=Category.CONTENT_SERVICE,
-                    qtype=QType.OPEN,
-                    question=f"Which parameter provides the consumed service name via content(...) in node type {nt.name}?",
-                    answer=str(param_name),
-                ))
-                qs.append(Question(
-                    level=Level.RELATION,
-                    category=Category.CONTENT_SERVICE,
-                    qtype=QType.OPEN,
-                    question=f"What is the declared type of the consumed content-based service in node type {nt.name}?",
-                    answer=str(srv_type) if srv_type else "Unknown",
-                ))
+        for (_ph, param_name, srv_type) in consumes_content:
+            qs.append(Question(
+                level=Level.RELATION,
+                category=Category.CONTENT_SERVICE,
+                qtype=QType.OPEN,
+                question=f"Which parameter provides the consumed service name via content(...) in node type {nt.name}?",
+                answer=str(param_name).strip() or _open_unknown(),
+            ))
+            qs.append(Question(
+                level=Level.RELATION,
+                category=Category.CONTENT_SERVICE,
+                qtype=QType.OPEN,
+                question=f"What is the declared type of the consumed content-based service in node type {nt.name}?",
+                answer=_opt_unknown(srv_type),
+            ))
 
         # TF edges
-        tf_edges = getattr(nt, "tf_edges", [])
+        tf_edges = getattr(nt, "tf_edges", []) or []
         qs.append(Question(
             level=Level.RELATION,
             category=Category.TF,
@@ -496,17 +541,15 @@ def generate_questions(
     # ------------------------------------------------------------
 
     for n in nodes:
-        # Node instance -> node type
         qs.append(Question(
             level=Level.RELATION,
             category=Category.NODE_INSTANCE,
             qtype=QType.OPEN,
             question=f"What is the node type of node instance {n.name}?",
-            answer=str(getattr(n.node_type, "name", "Unknown")),
+            answer=_opt_unknown(getattr(getattr(n, "node_type", None), "name", None)),
         ))
 
-        # Parameter assignments
-        assigns = getattr(n, "param_assigns", {})
+        assigns = getattr(n, "param_assigns", {}) or {}
         qs.append(Question(
             level=Level.RELATION,
             category=Category.PARAMETER_ASSIGN,
@@ -520,11 +563,10 @@ def generate_questions(
                 category=Category.PARAMETER_ASSIGN,
                 qtype=QType.OPEN,
                 question=f"What value is assigned to parameter {k} in node instance {n.name}?",
-                answer=_strip_quotes(v.value),
+                answer=_strip_quotes(v.value) if v and getattr(v, "value", None) is not None else _open_unknown(),
             ))
 
-        # Context assignments
-        cassigns = getattr(n, "context_assigns", {})
+        cassigns = getattr(n, "context_assigns", {}) or {}
         qs.append(Question(
             level=Level.RELATION,
             category=Category.CONTEXT_ASSIGN,
@@ -538,11 +580,10 @@ def generate_questions(
                 category=Category.CONTEXT_ASSIGN,
                 qtype=QType.OPEN,
                 question=f"What value is assigned to context {k} in node instance {n.name}?",
-                answer=_strip_quotes(v.value),
+                answer=_strip_quotes(v.value) if v and getattr(v, "value", None) is not None else _open_unknown(),
             ))
 
-        # Remaps
-        remaps = getattr(n, "remaps", [])
+        remaps = getattr(n, "remaps", []) or []
         qs.append(Question(
             level=Level.RELATION,
             category=Category.REMAP,
@@ -559,22 +600,36 @@ def generate_questions(
                 answer="Yes",
             ))
 
-        # Effective resolved connections (this is what you want for AMCL etc.)
-        qs.append(Question(Level.RELATION, Category.PUBLISH, QType.OPEN,
-                          f"To which topics can node {n.name} publish (after resolving content(...) and remaps)?",
-                          _comma_list(_effective_publishes(n))))
-        qs.append(Question(Level.RELATION, Category.SUBSCRIBE, QType.OPEN,
-                          f"To which topics is node {n.name} subscribed (after resolving content(...) and remaps)?",
-                          _comma_list(_effective_subscribes(n))))
-        qs.append(Question(Level.RELATION, Category.SERVICE, QType.OPEN,
-                          f"Which services does node {n.name} provide (after resolving content(...) and remaps)?",
-                          _comma_list(_effective_provides(n))))
-        qs.append(Question(Level.RELATION, Category.CLIENT, QType.OPEN,
-                          f"Which services does node {n.name} use as a client (after resolving content(...) and remaps)?",
-                          _comma_list(_effective_uses(n))))
+        qs.append(Question(
+            Level.RELATION,
+            Category.PUBLISH,
+            QType.OPEN,
+            f"To which topics can node {n.name} publish (after resolving content(...) and remaps)?",
+            _comma_list(_effective_publishes(n)),
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.SUBSCRIBE,
+            QType.OPEN,
+            f"To which topics is node {n.name} subscribed (after resolving content(...) and remaps)?",
+            _comma_list(_effective_subscribes(n)),
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.SERVICE,
+            QType.OPEN,
+            f"Which services does node {n.name} provide (after resolving content(...) and remaps)?",
+            _comma_list(_effective_provides(n)),
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.CLIENT,
+            QType.OPEN,
+            f"Which services does node {n.name} use as a client (after resolving content(...) and remaps)?",
+            _comma_list(_effective_uses(n)),
+        ))
 
-        # If the node type declares consumes_content_services, ask the AMCL/hector-style questions
-        for (_ph, param_name, srv_type) in getattr(n.node_type, "consumes_content_services", set()):
+        for (_ph, param_name, srv_type) in getattr(n.node_type, "consumes_content_services", set()) or set():
             qs.append(Question(
                 level=Level.RELATION,
                 category=Category.CONTENT_SERVICE,
@@ -598,21 +653,20 @@ def generate_questions(
                     category=Category.CONTENT_SERVICE,
                     qtype=QType.OPEN,
                     question=f"What is the resolved consumed service name for node {n.name} (via parameter {param_name})?",
-                    answer=resolved_name,
+                    answer=resolved_name or _open_unknown(),
                 ))
                 qs.append(Question(
                     level=Level.RELATION,
                     category=Category.CONTENT_SERVICE,
                     qtype=QType.OPEN,
                     question=f"What is the declared type of the consumed service resolved via parameter {param_name} in node {n.name}?",
-                    answer=str(srv_type) if srv_type else "Unknown",
+                    answer=_opt_unknown(srv_type),
                 ))
 
     # ------------------------------------------------------------
-    # Level 1: TOPIC family (publishers/subscribers + type)
+    # Level 1: TOPIC family
     # ------------------------------------------------------------
 
-    # Build who-publishes/subscribes using resolved effective names
     topic_publishers: Dict[str, Set[str]] = {}
     topic_subscribers: Dict[str, Set[str]] = {}
 
@@ -623,18 +677,30 @@ def generate_questions(
             topic_subscribers.setdefault(tname, set()).add(n.name)
 
     for t in topics:
-        qs.append(Question(Level.RELATION, Category.TOPIC_TYPE, QType.OPEN,
-                          f"What is the type of topic {t.name}?",
-                          t.type or "Unknown"))
-        qs.append(Question(Level.RELATION, Category.PUBLISH, QType.OPEN,
-                          f"Which nodes publish to topic {t.name} (after resolving content(...) and remaps)?",
-                          _comma_list(topic_publishers.get(t.name, set()))))
-        qs.append(Question(Level.RELATION, Category.SUBSCRIBE, QType.OPEN,
-                          f"Which nodes subscribe to topic {t.name} (after resolving content(...) and remaps)?",
-                          _comma_list(topic_subscribers.get(t.name, set()))))
+        qs.append(Question(
+            Level.RELATION,
+            Category.TOPIC_TYPE,
+            QType.OPEN,
+            f"What is the type of topic {t.name}?",
+            _opt_unknown(getattr(t, "type", None)),
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.PUBLISH,
+            QType.OPEN,
+            f"Which nodes publish to topic {t.name} (after resolving content(...) and remaps)?",
+            _comma_list(topic_publishers.get(t.name, set())),
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.SUBSCRIBE,
+            QType.OPEN,
+            f"Which nodes subscribe to topic {t.name} (after resolving content(...) and remaps)?",
+            _comma_list(topic_subscribers.get(t.name, set())),
+        ))
 
     # ------------------------------------------------------------
-    # Level 1: SERVICE family (providers/clients + type)
+    # Level 1: SERVICE family
     # ------------------------------------------------------------
 
     service_providers: Dict[str, Set[str]] = {}
@@ -644,24 +710,35 @@ def generate_questions(
         for sname in _effective_provides(n):
             service_providers.setdefault(sname, set()).add(n.name)
         for sname in _effective_uses(n):
-            # ignore unresolved content(param) placeholders for client listing
             if sname.startswith("content("):
                 continue
             service_clients.setdefault(sname, set()).add(n.name)
 
     for s in services:
-        qs.append(Question(Level.RELATION, Category.SERVICE_TYPE, QType.OPEN,
-                          f"What is the type of service {s.name}?",
-                          s.type or "Unknown"))
-        qs.append(Question(Level.RELATION, Category.SERVICE, QType.OPEN,
-                          f"Which nodes provide service {s.name} (after resolving content(...) and remaps)?",
-                          _comma_list(service_providers.get(s.name, set()))))
-        qs.append(Question(Level.RELATION, Category.CLIENT, QType.OPEN,
-                          f"Which nodes use service {s.name} as a client (after resolving content(...) and remaps)?",
-                          _comma_list(service_clients.get(s.name, set()))))
+        qs.append(Question(
+            Level.RELATION,
+            Category.SERVICE_TYPE,
+            QType.OPEN,
+            f"What is the type of service {s.name}?",
+            _opt_unknown(getattr(s, "type", None)),
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.SERVICE,
+            QType.OPEN,
+            f"Which nodes provide service {s.name} (after resolving content(...) and remaps)?",
+            _comma_list(service_providers.get(s.name, set())),
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.CLIENT,
+            QType.OPEN,
+            f"Which nodes use service {s.name} as a client (after resolving content(...) and remaps)?",
+            _comma_list(service_clients.get(s.name, set())),
+        ))
 
     # ------------------------------------------------------------
-    # Level 1: POLICY family (QoS policies)
+    # Level 1: POLICY family
     # ------------------------------------------------------------
 
     for p in qos_policies:
@@ -677,15 +754,15 @@ def generate_questions(
             category=Category.POLICY,
             qtype=QType.OPEN,
             question=f"What is the kind of policy instance {p.name}?",
-            answer=str(getattr(p, "kind", "Unknown")),
+            answer=_opt_unknown(getattr(p, "kind", None)),
         ))
-        settings = getattr(p, "settings", {})
+        settings = getattr(p, "settings", {}) or {}
         qs.append(Question(
             level=Level.RELATION,
             category=Category.POLICY,
             qtype=QType.OPEN,
             question=f"What settings are defined in policy instance {p.name}?",
-            answer=_comma_list([f"{k}={v}" for k, v in settings.items()]) if settings else "None",
+            answer=_comma_list([f"{k}={v}" for k, v in settings.items()]),
         ))
         for k, v in settings.items():
             qs.append(Question(
@@ -693,7 +770,7 @@ def generate_questions(
                 category=Category.POLICY,
                 qtype=QType.OPEN,
                 question=f"What is the value of setting {k} in policy instance {p.name}?",
-                answer=str(v),
+                answer=str(v).strip() or _open_unknown(),
             ))
 
     # ------------------------------------------------------------
@@ -701,35 +778,59 @@ def generate_questions(
     # ------------------------------------------------------------
 
     for a in type_aliases:
-        qs.append(Question(Level.RELATION, Category.TYPE_ALIAS, QType.BOOL,
-                          f"Is there a type alias called {a.name}?",
-                          "Yes"))
-        qs.append(Question(Level.RELATION, Category.TYPE_ALIAS, QType.OPEN,
-                          f"What is the definition of type alias {a.name}?",
-                          str(getattr(a, "definition", "Unknown"))))
+        qs.append(Question(
+            Level.RELATION,
+            Category.TYPE_ALIAS,
+            QType.BOOL,
+            f"Is there a type alias called {a.name}?",
+            "Yes",
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.TYPE_ALIAS,
+            QType.OPEN,
+            f"What is the definition of type alias {a.name}?",
+            _opt_unknown(getattr(a, "definition", None)),
+        ))
 
     # ------------------------------------------------------------
     # Level 1: MESSAGE ALIAS + FIELD family
     # ------------------------------------------------------------
 
     for m in message_aliases:
-        qs.append(Question(Level.RELATION, Category.MESSAGE_ALIAS, QType.BOOL,
-                          f"Is there a message alias called {m.name}?",
-                          "Yes"))
-        qs.append(Question(Level.RELATION, Category.MESSAGE_ALIAS, QType.OPEN,
-                          f"What is the base message type of message alias {m.name}?",
-                          str(getattr(m, "base_type", "Unknown"))))
-        fields = getattr(m, "fields", [])
-        qs.append(Question(Level.RELATION, Category.MESSAGE_FIELD, QType.OPEN,
-                          f"Which fields are defined in message alias {m.name}?",
-                          _comma_list([f.name for f in fields])))
+        qs.append(Question(
+            Level.RELATION,
+            Category.MESSAGE_ALIAS,
+            QType.BOOL,
+            f"Is there a message alias called {m.name}?",
+            "Yes",
+        ))
+        qs.append(Question(
+            Level.RELATION,
+            Category.MESSAGE_ALIAS,
+            QType.OPEN,
+            f"What is the base message type of message alias {m.name}?",
+            _opt_unknown(getattr(m, "base_type", None)),
+        ))
+        fields = getattr(m, "fields", []) or []
+        qs.append(Question(
+            Level.RELATION,
+            Category.MESSAGE_FIELD,
+            QType.OPEN,
+            f"Which fields are defined in message alias {m.name}?",
+            _comma_list([getattr(f, "name", "") for f in fields]),
+        ))
         for f in fields:
-            qs.append(Question(Level.RELATION, Category.MESSAGE_FIELD, QType.OPEN,
-                              f"What is the type of field {f.name} in message alias {m.name}?",
-                              str(getattr(f, "type", "Unknown"))))
+            qs.append(Question(
+                Level.RELATION,
+                Category.MESSAGE_FIELD,
+                QType.OPEN,
+                f"What is the type of field {getattr(f, 'name', '')} in message alias {m.name}?",
+                _opt_unknown(getattr(f, "type", None)),
+            ))
 
     # ------------------------------------------------------------
-    # Level 2: PATH questions (node-to-node reachability)
+    # Level 2: PATH questions
     # ------------------------------------------------------------
 
     for src in nodes:
