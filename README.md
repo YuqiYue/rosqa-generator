@@ -170,7 +170,7 @@ Each element in `questions` is a `Question` dataclass with the following attribu
 
 - **level**: abstraction level (`ENTITY`, `RELATION`, `PATH`)
 - **category**: semantic category (e.g., `PARAMETER`, `SERVICE`, `CONTENT_SERVICE`)
-- **qtype**: question type (`BOOL`, `MCQ`, `OPEN`)
+- **type**: question type (`BOOL`, `MCQ`, `OPEN`)
 - **question**: natural-language question
 - **answer**: ground-truth answer derived from the ROSpec
 
