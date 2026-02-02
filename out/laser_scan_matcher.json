@@ -1,5 +1,54 @@
 [
   {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called laser_scan_matcher_xbp?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called laser_scan_matcher_xef?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called laser_scan_matcher_xhh?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called laser_scan_matcher_xyg?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called laser_scan_matcher_xyp?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called laser_scan_matcher?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is laser_scan_matcher? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "3"
+  },
+  {
     "level": 1,
     "category": "NODE_TYPE",
     "type": "BOOL",
@@ -117,5 +166,68 @@
     "type": "OPEN",
     "question": "What TF relations are declared in node type laser_scan_matcher_type?",
     "answer": "broadcast world->base_link, listens base_link->laser"
+  },
+  {
+    "level": 1,
+    "category": "NODE_INSTANCE",
+    "type": "OPEN",
+    "question": "What is the node type of node instance laser_scan_matcher?",
+    "answer": "laser_scan_matcher_type"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "Which parameters are assigned in node instance laser_scan_matcher?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT_ASSIGN",
+    "type": "OPEN",
+    "question": "Which contexts are assigned in node instance laser_scan_matcher?",
+    "answer": "is_simulation"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT_ASSIGN",
+    "type": "OPEN",
+    "question": "What value is assigned to context is_simulation in node instance laser_scan_matcher?",
+    "answer": "true"
+  },
+  {
+    "level": 1,
+    "category": "REMAP",
+    "type": "OPEN",
+    "question": "Which remaps are declared in node instance laser_scan_matcher?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "To which topics can node laser_scan_matcher publish (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "To which topics is node laser_scan_matcher subscribed (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services does node laser_scan_matcher provide (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services does node laser_scan_matcher use as a client (after resolving content(...) and remaps)?",
+    "answer": "None"
   }
 ]

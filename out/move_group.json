@@ -1,5 +1,54 @@
 [
   {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called move_group_xed?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called move_group_xhn?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called move_group_xor?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called move_group_xsd?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called move_group_xvy?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called move_group?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is move_group? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "3"
+  },
+  {
     "level": 1,
     "category": "NODE_TYPE",
     "type": "BOOL",
@@ -11,7 +60,154 @@
     "category": "PARAMETER",
     "type": "OPEN",
     "question": "Which parameters are defined in node type move_group_type?",
+    "answer": "elbow_joint/has_acceleration_limits, elbow_joint/has_velocity_limits, elbow_joint/max_acceleration, elbow_joint/max_velocity, elbow_joint/min_velocity"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter elbow_joint/max_acceleration in node type move_group_type?",
+    "answer": "double"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter elbow_joint/max_acceleration optional in node type move_group_type?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter elbow_joint/max_acceleration in node type move_group_type?",
     "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter elbow_joint/max_acceleration in node type move_group_type have a constraint?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "OPEN",
+    "question": "What is the constraint of parameter elbow_joint/max_acceleration in node type move_group_type?",
+    "answer": "_ >= 0"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter elbow_joint/min_velocity in node type move_group_type?",
+    "answer": "double"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter elbow_joint/min_velocity optional in node type move_group_type?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter elbow_joint/min_velocity in node type move_group_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter elbow_joint/min_velocity in node type move_group_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter elbow_joint/max_velocity in node type move_group_type?",
+    "answer": "double"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter elbow_joint/max_velocity optional in node type move_group_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter elbow_joint/max_velocity in node type move_group_type?",
+    "answer": "1.2211"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter elbow_joint/max_velocity in node type move_group_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter elbow_joint/has_velocity_limits in node type move_group_type?",
+    "answer": "bool"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter elbow_joint/has_velocity_limits optional in node type move_group_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter elbow_joint/has_velocity_limits in node type move_group_type?",
+    "answer": "false"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter elbow_joint/has_velocity_limits in node type move_group_type have a constraint?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the type of parameter elbow_joint/has_acceleration_limits in node type move_group_type?",
+    "answer": "bool"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "BOOL",
+    "question": "Is parameter elbow_joint/has_acceleration_limits optional in node type move_group_type?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER",
+    "type": "OPEN",
+    "question": "What is the default value of parameter elbow_joint/has_acceleration_limits in node type move_group_type?",
+    "answer": "false"
+  },
+  {
+    "level": 1,
+    "category": "WHERE",
+    "type": "BOOL",
+    "question": "Does parameter elbow_joint/has_acceleration_limits in node type move_group_type have a constraint?",
+    "answer": "No"
   },
   {
     "level": 1,
@@ -67,20 +263,97 @@
     "category": "WHERE",
     "type": "BOOL",
     "question": "Does node type move_group_type declare a where-clause?",
-    "answer": "No"
+    "answer": "Yes"
   },
   {
     "level": 1,
     "category": "WHERE",
     "type": "OPEN",
     "question": "What is the where-clause of node type move_group_type?",
-    "answer": "None"
+    "answer": "exists(elbow_joint/max_velocity) -> elbow_joint/has_velocity_limits;\n    exists(elbow_joint/max_acceleration) -> elbow_joint/has_acceleration_limits;"
   },
   {
     "level": 1,
     "category": "TF",
     "type": "OPEN",
     "question": "What TF relations are declared in node type move_group_type?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "NODE_INSTANCE",
+    "type": "OPEN",
+    "question": "What is the node type of node instance move_group?",
+    "answer": "move_group_type"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "Which parameters are assigned in node instance move_group?",
+    "answer": "elbow_joint/max_acceleration, elbow_joint/max_velocity, elbow_joint/min_velocity"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "What value is assigned to parameter elbow_joint/max_acceleration in node instance move_group?",
+    "answer": "0.0"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "What value is assigned to parameter elbow_joint/min_velocity in node instance move_group?",
+    "answer": "0.0"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "What value is assigned to parameter elbow_joint/max_velocity in node instance move_group?",
+    "answer": "3.14"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT_ASSIGN",
+    "type": "OPEN",
+    "question": "Which contexts are assigned in node instance move_group?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "REMAP",
+    "type": "OPEN",
+    "question": "Which remaps are declared in node instance move_group?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "To which topics can node move_group publish (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "To which topics is node move_group subscribed (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services does node move_group provide (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services does node move_group use as a client (after resolving content(...) and remaps)?",
     "answer": "None"
   }
 ]

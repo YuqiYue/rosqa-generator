@@ -1,5 +1,124 @@
 [
   {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called content(scan_topic_name)_xgm?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called content(scan_topic_name)_xmk?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called content(scan_topic_name)_xpn?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called particle_cloud_xwa?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called reinitialize_global_localization_xbt?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called particle_cloud?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is particle_cloud? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "1"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called content(scan_topic_name)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is content(scan_topic_name)? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "1"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called initialpose?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is initialpose? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "1"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called content(map_topic_name)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is content(map_topic_name)? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "1"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called reinitialize_global_localization?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is reinitialize_global_localization? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "2"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called set_initial_pose?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is set_initial_pose? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "2"
+  },
+  {
     "level": 1,
     "category": "NODE_TYPE",
     "type": "BOOL",
@@ -256,7 +375,7 @@
     "category": "ATTACHMENT",
     "type": "OPEN",
     "question": "Which QoS policy tags are attached in node type amcl_type?",
-    "answer": "None"
+    "answer": "sensor_data, sensor_data_profile, system_default_qos, transient_reliable_qos"
   },
   {
     "level": 1,
@@ -270,21 +389,21 @@
     "category": "PUBLISH",
     "type": "OPEN",
     "question": "Which topics can node type amcl_type publish to (as declared)?",
-    "answer": "None"
+    "answer": "particle_cloud"
   },
   {
     "level": 1,
     "category": "SUBSCRIBE",
     "type": "OPEN",
     "question": "Which topics can node type amcl_type subscribe to (as declared)?",
-    "answer": "None"
+    "answer": "content(map_topic_name), content(scan_topic_name), initialpose"
   },
   {
     "level": 1,
     "category": "SERVICE",
     "type": "OPEN",
     "question": "Which services can node type amcl_type provide (as declared)?",
-    "answer": "None"
+    "answer": "reinitialize_global_localization, set_initial_pose"
   },
   {
     "level": 1,
@@ -298,20 +417,230 @@
     "category": "WHERE",
     "type": "BOOL",
     "question": "Does node type amcl_type declare a where-clause?",
-    "answer": "No"
+    "answer": "Yes"
   },
   {
     "level": 1,
     "category": "WHERE",
     "type": "OPEN",
     "question": "What is the where-clause of node type amcl_type?",
-    "answer": "None"
+    "answer": "laser_model_type == Beam\n        -> z_hit + z_max + z_rand + z_short == 1;\n\n    laser_model_type == LikelihoodField\n        -> z_hit + z_rand == 1;\n\n    always_reset_initial_pose\n        -> exists(initialpose);"
   },
   {
     "level": 1,
     "category": "TF",
     "type": "OPEN",
     "question": "What TF relations are declared in node type amcl_type?",
+    "answer": "broadcast base_link->scan, broadcast map->odom, broadcast odom->base_link"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type amcl_type publish to topic content(map_topic_name) (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type amcl_type publish to topic content(scan_topic_name) (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type amcl_type publish to topic initialpose (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type amcl_type publish to topic particle_cloud (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type amcl_type subscribed to topic content(map_topic_name) (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type amcl_type subscribed to topic content(scan_topic_name) (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type amcl_type subscribed to topic initialpose (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type amcl_type subscribed to topic particle_cloud (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node type amcl_type provide service reinitialize_global_localization (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node type amcl_type provide service set_initial_pose (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node type amcl_type use service reinitialize_global_localization as a client (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node type amcl_type use service set_initial_pose as a client (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "TOPIC_TYPE",
+    "type": "OPEN",
+    "question": "What is the type of topic particle_cloud?",
+    "answer": "nav2_msgs/ParticleCloud"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which nodes publish to topic particle_cloud (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which nodes subscribe to topic particle_cloud (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "TOPIC_TYPE",
+    "type": "OPEN",
+    "question": "What is the type of topic content(scan_topic_name)?",
+    "answer": "RestrictedLaserScan"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which nodes publish to topic content(scan_topic_name) (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which nodes subscribe to topic content(scan_topic_name) (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "TOPIC_TYPE",
+    "type": "OPEN",
+    "question": "What is the type of topic initialpose?",
+    "answer": "geometry_msgs/PoseWithCovarianceStamped\n        where { count(publishers(_)) == 1 }"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which nodes publish to topic initialpose (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which nodes subscribe to topic initialpose (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "TOPIC_TYPE",
+    "type": "OPEN",
+    "question": "What is the type of topic content(map_topic_name)?",
+    "answer": "nav_msgs/OccupancyGrid"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which nodes publish to topic content(map_topic_name) (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which nodes subscribe to topic content(map_topic_name) (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE_TYPE",
+    "type": "OPEN",
+    "question": "What is the type of service reinitialize_global_localization?",
+    "answer": "std_srvs/Empty"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which nodes provide service reinitialize_global_localization (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which nodes use service reinitialize_global_localization as a client (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE_TYPE",
+    "type": "OPEN",
+    "question": "What is the type of service set_initial_pose?",
+    "answer": "nav2_msgs/SetInitialPose"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which nodes provide service set_initial_pose (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which nodes use service set_initial_pose as a client (after resolving content(...) and remaps)?",
     "answer": "None"
   },
   {
@@ -327,5 +656,89 @@
     "type": "OPEN",
     "question": "What is the definition of type alias LaserModelType?",
     "answer": "Enum[Beam, LikelihoodField, LikelihoodFieldProb]"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type amcl_type publish to topic content(map_topic_name) (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type amcl_type subscribed to topic content(map_topic_name) (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type amcl_type publish to topic content(scan_topic_name) (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type amcl_type subscribed to topic content(scan_topic_name) (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type amcl_type publish to topic initialpose (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type amcl_type subscribed to topic initialpose (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type amcl_type publish to topic particle_cloud (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type amcl_type subscribed to topic particle_cloud (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node type amcl_type provide service reinitialize_global_localization (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node type amcl_type use service reinitialize_global_localization as a client (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node type amcl_type provide service set_initial_pose (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node type amcl_type use service set_initial_pose as a client (as declared)?",
+    "answer": "No"
   }
 ]

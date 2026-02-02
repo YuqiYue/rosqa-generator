@@ -10,5 +10,6 @@ src/rosqa.egg-info/PKG-INFO
 src/rosqa.egg-info/SOURCES.txt
 src/rosqa.egg-info/dependency_links.txt
 src/rosqa.egg-info/entry_points.txt
+src/rosqa.egg-info/requires.txt
 src/rosqa.egg-info/top_level.txt
 test/test_library_api.py

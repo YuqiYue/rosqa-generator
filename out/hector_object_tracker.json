@@ -3,36 +3,64 @@
     "level": 0,
     "category": "ENTITY",
     "type": "BOOL",
-    "question": "Is there a ROS2 entity called /hector_map_server/get_distance_to_obstacle_xcy?",
+    "question": "Is there a ROS2 entity called /hector_map_server/get_distance_to_obstacle_xaj?",
     "answer": "No"
   },
   {
     "level": 0,
     "category": "ENTITY",
     "type": "BOOL",
-    "question": "Is there a ROS2 entity called visualization_marker_xeu?",
+    "question": "Is there a ROS2 entity called hector_map_server_xdp?",
     "answer": "No"
   },
   {
     "level": 0,
     "category": "ENTITY",
     "type": "BOOL",
-    "question": "Is there a ROS2 entity called visualization_marker_xol?",
+    "question": "Is there a ROS2 entity called hector_object_tracker_xmq?",
     "answer": "No"
   },
   {
     "level": 0,
     "category": "ENTITY",
     "type": "BOOL",
-    "question": "Is there a ROS2 entity called visualization_marker_xsx?",
+    "question": "Is there a ROS2 entity called visualization_marker_xnm?",
     "answer": "No"
   },
   {
     "level": 0,
     "category": "ENTITY",
     "type": "BOOL",
-    "question": "Is there a ROS2 entity called worldmodel/image_percept_xhl?",
+    "question": "Is there a ROS2 entity called worldmodel/image_percept_xcf?",
     "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called hector_object_tracker?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is hector_object_tracker? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "3"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called hector_map_server?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is hector_map_server? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "3"
   },
   {
     "level": 0,
@@ -204,6 +232,48 @@
   },
   {
     "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type hector_object_tracker_type publish to topic visualization_marker (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type hector_object_tracker_type publish to topic worldmodel/image_percept (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type hector_object_tracker_type subscribed to topic visualization_marker (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type hector_object_tracker_type subscribed to topic worldmodel/image_percept (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node type hector_object_tracker_type provide service /hector_map_server/get_distance_to_obstacle (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node type hector_object_tracker_type use service /hector_map_server/get_distance_to_obstacle as a client (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
     "category": "NODE_TYPE",
     "type": "BOOL",
     "question": "Is there a ROSpec node type called hector_map_server_type?",
@@ -288,6 +358,286 @@
   },
   {
     "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type hector_map_server_type publish to topic visualization_marker (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type hector_map_server_type publish to topic worldmodel/image_percept (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type hector_map_server_type subscribed to topic visualization_marker (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type hector_map_server_type subscribed to topic worldmodel/image_percept (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node type hector_map_server_type provide service /hector_map_server/get_distance_to_obstacle (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node type hector_map_server_type use service /hector_map_server/get_distance_to_obstacle as a client (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "NODE_INSTANCE",
+    "type": "OPEN",
+    "question": "What is the node type of node instance hector_object_tracker?",
+    "answer": "hector_object_tracker_type"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "Which parameters are assigned in node instance hector_object_tracker?",
+    "answer": "distance_to_obstacle_service"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "What value is assigned to parameter distance_to_obstacle_service in node instance hector_object_tracker?",
+    "answer": "get_distance_to_obstacle"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT_ASSIGN",
+    "type": "OPEN",
+    "question": "Which contexts are assigned in node instance hector_object_tracker?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "REMAP",
+    "type": "OPEN",
+    "question": "Which remaps are declared in node instance hector_object_tracker?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "To which topics can node hector_object_tracker publish (after resolving content(...) and remaps)?",
+    "answer": "visualization_marker"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "To which topics is node hector_object_tracker subscribed (after resolving content(...) and remaps)?",
+    "answer": "worldmodel/image_percept"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services does node hector_object_tracker provide (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services does node hector_object_tracker use as a client (after resolving content(...) and remaps)?",
+    "answer": "get_distance_to_obstacle"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node hector_object_tracker publish to topic visualization_marker (after resolving content(...) and remaps)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node hector_object_tracker publish to topic worldmodel/image_percept (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node hector_object_tracker subscribed to topic visualization_marker (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node hector_object_tracker subscribed to topic worldmodel/image_percept (after resolving content(...) and remaps)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node hector_object_tracker provide service /hector_map_server/get_distance_to_obstacle (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node hector_object_tracker use service /hector_map_server/get_distance_to_obstacle as a client (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CONTENT_SERVICE",
+    "type": "BOOL",
+    "question": "Does node hector_object_tracker consume a service whose name is provided by parameter distance_to_obstacle_service?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "CONTENT_SERVICE",
+    "type": "BOOL",
+    "question": "Is parameter distance_to_obstacle_service assigned in node instance hector_object_tracker for resolving the consumed service name?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "CONTENT_SERVICE",
+    "type": "OPEN",
+    "question": "What is the resolved consumed service name for node hector_object_tracker (via parameter distance_to_obstacle_service)?",
+    "answer": "get_distance_to_obstacle"
+  },
+  {
+    "level": 1,
+    "category": "CONTENT_SERVICE",
+    "type": "OPEN",
+    "question": "What is the declared type of the consumed service resolved via parameter distance_to_obstacle_service in node hector_object_tracker?",
+    "answer": "hector_nav_msgs/GetDistanceToObstacle"
+  },
+  {
+    "level": 1,
+    "category": "NODE_INSTANCE",
+    "type": "OPEN",
+    "question": "What is the node type of node instance hector_map_server?",
+    "answer": "hector_map_server_type"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "Which parameters are assigned in node instance hector_map_server?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT_ASSIGN",
+    "type": "OPEN",
+    "question": "Which contexts are assigned in node instance hector_map_server?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "REMAP",
+    "type": "OPEN",
+    "question": "Which remaps are declared in node instance hector_map_server?",
+    "answer": "/hector_map_server/get_distance_to_obstacle->get_distance_to_obstacle"
+  },
+  {
+    "level": 1,
+    "category": "REMAP",
+    "type": "BOOL",
+    "question": "Does node instance hector_map_server remap /hector_map_server/get_distance_to_obstacle to get_distance_to_obstacle?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "To which topics can node hector_map_server publish (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "To which topics is node hector_map_server subscribed (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services does node hector_map_server provide (after resolving content(...) and remaps)?",
+    "answer": "get_distance_to_obstacle"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services does node hector_map_server use as a client (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node hector_map_server publish to topic visualization_marker (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node hector_map_server publish to topic worldmodel/image_percept (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node hector_map_server subscribed to topic visualization_marker (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node hector_map_server subscribed to topic worldmodel/image_percept (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node hector_map_server provide service /hector_map_server/get_distance_to_obstacle (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node hector_map_server use service /hector_map_server/get_distance_to_obstacle as a client (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
     "category": "TOPIC_TYPE",
     "type": "OPEN",
     "question": "What is the type of topic visualization_marker?",
@@ -298,7 +648,7 @@
     "category": "PUBLISH",
     "type": "OPEN",
     "question": "Which nodes publish to topic visualization_marker (after resolving content(...) and remaps)?",
-    "answer": "None"
+    "answer": "hector_object_tracker"
   },
   {
     "level": 1,
@@ -326,7 +676,7 @@
     "category": "SUBSCRIBE",
     "type": "OPEN",
     "question": "Which nodes subscribe to topic worldmodel/image_percept (after resolving content(...) and remaps)?",
-    "answer": "None"
+    "answer": "hector_object_tracker"
   },
   {
     "level": 1,
@@ -348,5 +698,187 @@
     "type": "OPEN",
     "question": "Which nodes use service /hector_map_server/get_distance_to_obstacle as a client (after resolving content(...) and remaps)?",
     "answer": "None"
+  },
+  {
+    "level": 2,
+    "category": "MESSAGE",
+    "type": "BOOL",
+    "question": "Is there a communication path from node hector_object_tracker to node hector_map_server via a topic or service?",
+    "answer": "Yes"
+  },
+  {
+    "level": 2,
+    "category": "MESSAGE",
+    "type": "BOOL",
+    "question": "Is there a communication path from node hector_map_server to node hector_object_tracker via a topic or service?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type hector_object_tracker_type publish to topic visualization_marker (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type hector_object_tracker_type subscribed to topic visualization_marker (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type hector_object_tracker_type publish to topic worldmodel/image_percept (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type hector_object_tracker_type subscribed to topic worldmodel/image_percept (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node type hector_object_tracker_type provide service /hector_map_server/get_distance_to_obstacle (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node type hector_object_tracker_type use service /hector_map_server/get_distance_to_obstacle as a client (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type hector_map_server_type publish to topic visualization_marker (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type hector_map_server_type subscribed to topic visualization_marker (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type hector_map_server_type publish to topic worldmodel/image_percept (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type hector_map_server_type subscribed to topic worldmodel/image_percept (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node type hector_map_server_type provide service /hector_map_server/get_distance_to_obstacle (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node type hector_map_server_type use service /hector_map_server/get_distance_to_obstacle as a client (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node hector_object_tracker publish to topic visualization_marker (after resolving content(...) and remaps)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node hector_object_tracker subscribed to topic visualization_marker (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node hector_object_tracker publish to topic worldmodel/image_percept (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node hector_object_tracker subscribed to topic worldmodel/image_percept (after resolving content(...) and remaps)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node hector_object_tracker provide service /hector_map_server/get_distance_to_obstacle (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node hector_object_tracker use service /hector_map_server/get_distance_to_obstacle as a client (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node hector_map_server publish to topic visualization_marker (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node hector_map_server subscribed to topic visualization_marker (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node hector_map_server publish to topic worldmodel/image_percept (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node hector_map_server subscribed to topic worldmodel/image_percept (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "BOOL",
+    "question": "Does node hector_map_server provide service /hector_map_server/get_distance_to_obstacle (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "BOOL",
+    "question": "Does node hector_map_server use service /hector_map_server/get_distance_to_obstacle as a client (after resolving content(...) and remaps)?",
+    "answer": "No"
   }
 ]

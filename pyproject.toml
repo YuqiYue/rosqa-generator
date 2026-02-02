@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Generate comprehension questions from ROS2 rospec specifications"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+  "matplotlib"
+]
 
 [project.scripts]
 rosqa = "rosqa.cli:main"

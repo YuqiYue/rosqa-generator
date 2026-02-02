@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import Optional, Tuple, Union
 
 from .model import (
     ContextAssign,
@@ -21,74 +22,107 @@ from .model import (
     TypeAlias,
 )
 
-# ---------------------------
-# Top level blocks and helpers
-# ---------------------------
-
-NODE_TYPE_BLOCK_RE = re.compile(
-    r"node\s+type\s+(?P<name>\w+)\s*\{(?P<body>.*?)\}\s*(?:where\s*\{(?P<where>.*?)\}\s*)?",
-    re.DOTALL,
-)
-
-SYSTEM_BLOCK_RE = re.compile(
-    r"system\s*\{(?P<body>.*?)\}",
-    re.DOTALL,
-)
-
-NODE_INSTANCE_BLOCK_RE = re.compile(
-    r"node\s+instance\s+(?P<name>\w+)\s*:\s*(?P<type>\w+)\s*\{(?P<body>.*?)\}",
-    re.DOTALL,
-)
-
-QOS_POLICY_BLOCK_RE = re.compile(
-    r"policy\s+instance\s+(?P<name>\w+)\s*:\s*(?P<kind>\w+)\s*\{(?P<body>.*?)\}",
-    re.DOTALL,
-)
-
-TYPE_ALIAS_RE = re.compile(
-    r"type\s+alias\s+(?P<name>\w+)\s*:\s*(?P<def>.*?);",
-    re.DOTALL,
-)
-
-MESSAGE_ALIAS_BLOCK_RE = re.compile(
-    r"message\s+alias\s+(?P<name>\w+)\s*:\s*(?P<base>[\w/]+)\s*\{(?P<body>.*?)\}",
-    re.DOTALL,
-)
-
-MESSAGE_FIELD_RE = re.compile(
-    r"field\s+(?P<name>\w+)\s*:\s*(?P<type>[\w/\[\]]+)\s*;",
-    re.DOTALL,
-)
-
+# ===========================
+# Helpers: comments + braces
+# ===========================
 
 def _strip_comments(text: str) -> str:
-    # Remove // comments
+    # Remove // comments (ROSpec uses //)
     return re.sub(r"//.*?$", "", text, flags=re.MULTILINE)
 
 
-# ---------------------------
-# Inside node type parsing
-# ---------------------------
+def _extract_brace_block(text: str, lbrace_idx: int) -> Tuple[str, int]:
+    """
+    Given text and an index pointing at '{', return (block_content, rbrace_idx)
+    where block_content is inside braces, and rbrace_idx is the index of the matching '}'.
+    Supports nested braces.
+    """
+    if lbrace_idx < 0 or lbrace_idx >= len(text) or text[lbrace_idx] != "{":
+        raise ValueError("Expected '{' at lbrace_idx")
+
+    depth = 0
+    i = lbrace_idx
+    begin = lbrace_idx + 1
+
+    while i < len(text):
+        ch = text[i]
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return text[begin:i], i
+        i += 1
+
+    raise ValueError("Unbalanced braces in ROSpec input")
+
+
+def _skip_ws(text: str, i: int) -> int:
+    while i < len(text) and text[i].isspace():
+        i += 1
+    return i
+
+
+def _read_keyword_then_block(text: str, i: int, keyword: str) -> Tuple[Optional[str], int]:
+    """
+    If text at/after i starts with `keyword` (as a word), then parse `{...}` and return (body, new_i).
+    Otherwise return (None, i).
+    """
+    j = _skip_ws(text, i)
+    # word boundary match
+    if not re.match(rf"{re.escape(keyword)}\b", text[j:]):
+        return None, i
+
+    j += len(keyword)
+    j = _skip_ws(text, j)
+    if j >= len(text) or text[j] != "{":
+        return None, i
+
+    body, rbrace = _extract_brace_block(text, j)
+    return body, rbrace + 1
+
+
+# ===========================
+# Regex for non-nested lines
+# ===========================
+
+# Communication lines
+# Supports:
+#   publishes /a : T;
+#   publishes to /a : T;
+#   subscribes /b : T;
+#   provides service /s : T;
+#   provides /s : T;
+#   uses service /s : T;
+#   uses /s : T;
+
+_COMM_NAME = r"(?P<name>[^:;]+?)"
+_COMM_TYPE = r"(?P<type>[^;]+?)"
 
 COMM_PUBLISH_RE = re.compile(
-    r"publishes\s+to\s+(?P<name>[^\s:]+)\s*:\s*(?P<type>[^;]+)\s*;"
+    rf"\bpublishes(?:\s+to)?\s+{_COMM_NAME}\s*:\s*{_COMM_TYPE}\s*;",
+    flags=re.MULTILINE,
 )
 COMM_SUBSCRIBE_RE = re.compile(
-    r"subscribes\s+to\s+(?P<name>[^\s:]+)\s*:\s*(?P<type>[^;]+)\s*;"
+    rf"\bsubscribes(?:\s+to)?\s+{_COMM_NAME}\s*:\s*{_COMM_TYPE}\s*;",
+    flags=re.MULTILINE,
 )
-
 COMM_PROVIDES_RE = re.compile(
-    r"provides\s+service\s+(?P<name>[^\s:]+)\s*:\s*(?P<type>[^;]+)\s*;"
+    rf"\bprovides(?:\s+service)?(?:\s+to)?\s+{_COMM_NAME}\s*:\s*{_COMM_TYPE}\s*;",
+    flags=re.MULTILINE,
 )
 COMM_USES_RE = re.compile(
-    r"uses\s+service\s+(?P<name>[^\s:]+)\s*:\s*(?P<type>[^;]+)\s*;"
+    rf"\buses(?:\s+service)?(?:\s+to)?\s+{_COMM_NAME}\s*:\s*{_COMM_TYPE}\s*;",
+    flags=re.MULTILINE,
 )
 
 # consumes service content(distance_to_obstacle_service): hector_nav_msgs/GetDistanceToObstacle;
 COMM_CONSUMES_CONTENT_RE = re.compile(
-    r"consumes\s+service\s+content\((?P<param>\w+)\)\s*:\s*(?P<type>[^;]+)\s*;"
+    r"\bconsumes\s+service\s+content\((?P<param>\w+)\)\s*:\s*(?P<type>[^;]+?)\s*;",
+    flags=re.MULTILINE,
 )
 
+# Parameters and contexts
 # param elbow_joint/max_acceleration: double where {_ >= 0};
 # optional param elbow_joint/max_velocity: double = 1.2211;
 PARAM_DEF_RE = re.compile(
@@ -97,57 +131,94 @@ PARAM_DEF_RE = re.compile(
     r"(?:\s*=\s*(?P<default>[^;]+?))?"
     r"(?:\s+where\s*\{(?P<constraint>[^}]*)\})?"
     r"\s*;",
-    re.DOTALL,
+    flags=re.DOTALL,
 )
 
-# context is_simulation: bool;
 CONTEXT_DEF_RE = re.compile(
     r"context\s+(?P<name>\w+)\s*:\s*(?P<type>[\w/]+)\s*;",
+    flags=re.MULTILINE,
 )
 
 # Attachments like @qos{best_effort_qos} or @color_format{Grayscale}
 ATTACHMENT_RE = re.compile(
-    r"@(?P<key>\w+)\s*\{\s*(?P<value>[^}]+)\s*\}\s*",
+    r"@(?P<key>\w+)\s*\{\s*(?P<value>[^}]+)\s*\}",
+    flags=re.MULTILINE,
 )
 
-# TF lines
-TF_BROADCAST_RE = re.compile(r"broadcast\s+(?P<frm>[\w/]+)\s+to\s+(?P<to>[\w/]+)\s*;")
-TF_LISTENS_RE = re.compile(r"listens\s+(?P<frm>[\w/]+)\s+to\s+(?P<to>[\w/]+)\s*;")
+# TF
+TF_BROADCAST_RE = re.compile(
+    r"\bbroadcast\s+(?P<frm>[\w/]+)\s+to\s+(?P<to>[\w/]+)\s*;",
+    flags=re.MULTILINE,
+)
+TF_LISTENS_RE = re.compile(
+    r"\blistens\s+(?P<frm>[\w/]+)\s+to\s+(?P<to>[\w/]+)\s*;",
+    flags=re.MULTILINE,
+)
 
+# QoS policies
+QOS_POLICY_HEAD_RE = re.compile(
+    r"\bpolicy\s+instance\s+(?P<name>\w+)\s*:\s*(?P<kind>\w+)\s*\{",
+    flags=re.MULTILINE,
+)
+QOS_SETTING_RE = re.compile(
+    r"\bsetting\s+(?P<key>\w+)\s*=\s*(?P<value>[^;]+?)\s*;",
+    flags=re.MULTILINE,
+)
 
-# ---------------------------
-# Inside system instance parsing
-# ---------------------------
+# Type alias
+TYPE_ALIAS_RE = re.compile(
+    r"\btype\s+alias\s+(?P<name>\w+)\s*:\s*(?P<def>.*?);",
+    flags=re.DOTALL,
+)
+
+# Message alias
+MESSAGE_ALIAS_HEAD_RE = re.compile(
+    r"\bmessage\s+alias\s+(?P<name>\w+)\s*:\s*(?P<base>[\w/]+)\s*\{",
+    flags=re.MULTILINE,
+)
+MESSAGE_FIELD_RE = re.compile(
+    r"\bfield\s+(?P<name>\w+)\s*:\s*(?P<type>[\w/\[\]]+)\s*;",
+    flags=re.MULTILINE,
+)
+
+# System and node instances
+SYSTEM_HEAD_RE = re.compile(r"\bsystem\s*\{", flags=re.MULTILINE)
+
+NODE_INSTANCE_HEAD_RE = re.compile(
+    r"\bnode\s+instance\s+(?P<name>\w+)\s*:\s*(?P<type>\w+)\s*\{",
+    flags=re.MULTILINE,
+)
 
 PARAM_ASSIGN_RE = re.compile(
-    r"param\s+(?P<name>[\w/]+)\s*=\s*(?P<value>[^;]+)\s*;",
-    re.DOTALL,
+    r"\bparam\s+(?P<name>[\w/]+)\s*=\s*(?P<value>[^;]+?)\s*;",
+    flags=re.DOTALL,
 )
-
 CONTEXT_ASSIGN_RE = re.compile(
-    r"context\s+(?P<name>\w+)\s*=\s*(?P<value>[^;]+)\s*;",
-    re.DOTALL,
+    r"\bcontext\s+(?P<name>\w+)\s*=\s*(?P<value>[^;]+?)\s*;",
+    flags=re.DOTALL,
 )
-
 REMAP_RE = re.compile(
-    r"remap\s+(?P<frm>[^\s]+)\s+to\s+(?P<to>[^\s;]+)\s*;",
+    r"\bremap\s+(?P<frm>[^\s]+)\s+to\s+(?P<to>[^\s;]+)\s*;",
+    flags=re.MULTILINE,
+)
+
+# Node types: we only use a HEAD regex + brace extraction (important!)
+NODE_TYPE_HEAD_RE = re.compile(
+    r"\bnode\s+type\s+(?P<name>\w+)\s*\{",
+    flags=re.MULTILINE,
 )
 
 
-# ---------------------------
-# QoS policy parsing
-# ---------------------------
-
-QOS_SETTING_RE = re.compile(
-    r"setting\s+(?P<key>\w+)\s*=\s*(?P<value>[^;]+)\s*;",
-)
-
+# ===========================
+# Parsers
+# ===========================
 
 def _parse_qos_policies(text: str, g: Graph) -> None:
-    for m in QOS_POLICY_BLOCK_RE.finditer(text):
+    for m in QOS_POLICY_HEAD_RE.finditer(text):
         name = m.group("name")
         kind = m.group("kind")
-        body = m.group("body")
+        lbrace_idx = m.end() - 1  # points to '{'
+        body, rbrace_idx = _extract_brace_block(text, lbrace_idx)
 
         pol = QoSPolicy(name=name, kind=kind)
         for sm in QOS_SETTING_RE.finditer(body):
@@ -164,10 +235,11 @@ def _parse_type_aliases(text: str, g: Graph) -> None:
 
 
 def _parse_message_aliases(text: str, g: Graph) -> None:
-    for m in MESSAGE_ALIAS_BLOCK_RE.finditer(text):
+    for m in MESSAGE_ALIAS_HEAD_RE.finditer(text):
         name = m.group("name")
         base = m.group("base")
-        body = m.group("body")
+        lbrace_idx = m.end() - 1
+        body, _ = _extract_brace_block(text, lbrace_idx)
 
         ma = MessageAlias(name=name, base_type=base)
         for fm in MESSAGE_FIELD_RE.finditer(body):
@@ -176,15 +248,26 @@ def _parse_message_aliases(text: str, g: Graph) -> None:
 
 
 def _parse_node_types(text: str, g: Graph) -> None:
-    for m in NODE_TYPE_BLOCK_RE.finditer(text):
+    """
+    Parse node types using brace matching to correctly handle nested blocks such as:
+      communication { ... }
+      attachments { ... }
+      tf { ... }
+    Also supports an optional trailing:
+      where { ... }
+    """
+    for m in NODE_TYPE_HEAD_RE.finditer(text):
         name = m.group("name")
-        body = m.group("body")
-        where_block = m.group("where")
+        lbrace_idx = m.end() - 1
+        body, rbrace_idx = _extract_brace_block(text, lbrace_idx)
+
+        # Optional: where { ... } after the node type block
+        where_body, next_i = _read_keyword_then_block(text, rbrace_idx + 1, "where")
 
         nt = NodeType(name=name)
-        nt.where_block = where_block.strip() if where_block else None
+        nt.where_block = where_body.strip() if where_body else None
 
-        # --- comm (topics/services) ---
+        # Parse communications anywhere inside body (works even if they are inside "communication { ... }")
         for pm in COMM_PUBLISH_RE.finditer(body):
             topic = pm.group("name").strip()
             typ = pm.group("type").strip() or None
@@ -213,13 +296,13 @@ def _parse_node_types(text: str, g: Graph) -> None:
             if srv not in g.services:
                 g.services[srv] = Service(name=srv, type=typ)
 
-        # --- dynamic content(service) ---
+        # Dynamic content(service) constructs
         for cm in COMM_CONSUMES_CONTENT_RE.finditer(body):
             param_name = cm.group("param").strip()
             srv_type = cm.group("type").strip() or None
             nt.consumes_content_services.add(("<content>", param_name, srv_type))
 
-        # --- parameters ---
+        # Parameters
         for dm in PARAM_DEF_RE.finditer(body):
             p = ParameterDef(
                 name=dm.group("name").strip(),
@@ -230,12 +313,12 @@ def _parse_node_types(text: str, g: Graph) -> None:
             )
             nt.parameters[p.name] = p
 
-        # --- contexts ---
+        # Contexts
         for xm in CONTEXT_DEF_RE.finditer(body):
             c = ContextDef(name=xm.group("name").strip(), type=xm.group("type").strip())
             nt.contexts[c.name] = c
 
-        # --- attachments ---
+        # Attachments
         for am in ATTACHMENT_RE.finditer(body):
             key = am.group("key").strip()
             value = am.group("value").strip()
@@ -244,10 +327,9 @@ def _parse_node_types(text: str, g: Graph) -> None:
             else:
                 nt.other_attachments[key] = value
 
-        # --- TF ---
+        # TF
         for tm in TF_BROADCAST_RE.finditer(body):
             nt.tf_edges.append(TFEdge(relation="broadcast", frm=tm.group("frm"), to=tm.group("to")))
-
         for tm in TF_LISTENS_RE.finditer(body):
             nt.tf_edges.append(TFEdge(relation="listens", frm=tm.group("frm"), to=tm.group("to")))
 
@@ -257,20 +339,21 @@ def _parse_node_types(text: str, g: Graph) -> None:
 def _parse_system_instances(text: str, g: Graph) -> None:
     """
     System block is OPTIONAL.
-
     If missing: do nothing (graph.nodes remains empty).
-    If present: parse node instances, assignments, and remaps.
+    If present: parse node instances, assignments, and remaps using brace matching.
     """
-    m = SYSTEM_BLOCK_RE.search(text)
+    m = SYSTEM_HEAD_RE.search(text)
     if not m:
-        return  # IMPORTANT CHANGE: no crash if no system block
+        return
 
-    sys_body = m.group("body")
+    lbrace_idx = m.end() - 1
+    sys_body, _ = _extract_brace_block(text, lbrace_idx)
 
-    for im in NODE_INSTANCE_BLOCK_RE.finditer(sys_body):
+    for im in NODE_INSTANCE_HEAD_RE.finditer(sys_body):
         inst_name = im.group("name")
         type_name = im.group("type")
-        body = im.group("body")
+        inst_lbrace = im.end() - 1
+        body, _ = _extract_brace_block(sys_body, inst_lbrace)
 
         nt = g.node_types.get(type_name)
         if not nt:
@@ -279,27 +362,33 @@ def _parse_system_instances(text: str, g: Graph) -> None:
 
         node = Node(name=inst_name, node_type=nt)
 
-        # parameter assignments
         for pm in PARAM_ASSIGN_RE.finditer(body):
             key = pm.group("name").strip()
             val = pm.group("value").strip()
             node.param_assigns[key] = ParameterAssign(name=key, value=val)
 
-        # context assignments
         for cm in CONTEXT_ASSIGN_RE.finditer(body):
             key = cm.group("name").strip()
             val = cm.group("value").strip()
             node.context_assigns[key] = ContextAssign(name=key, value=val)
 
-        # remaps
         for rm in REMAP_RE.finditer(body):
             node.remaps.append(Remap(frm=rm.group("frm").strip(), to=rm.group("to").strip()))
 
         g.nodes[node.name] = node
 
 
-def load_graph_from_rospec(path: Path) -> Graph:
-    text = _strip_comments(path.read_text())
+# ===========================
+# Public API
+# ===========================
+
+def load_graph_from_rospec(path: Union[Path, str]) -> Graph:
+    """
+    Load a ROSpec file and parse into a Graph.
+    Accepts a Path or a string path.
+    """
+    p = Path(path) if not isinstance(path, Path) else path
+    text = _strip_comments(p.read_text(encoding="utf-8"))
 
     g = Graph()
 

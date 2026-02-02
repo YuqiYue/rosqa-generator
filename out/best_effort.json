@@ -1,5 +1,82 @@
 [
   {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called /camera/rgb/image_raw_xcn?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called custom_node_xat?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called custom_node_xvw?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called openni_camera_driver_xcx?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called openni_camera_driver_xlp?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called custom_node?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is custom_node? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "3"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called openni_camera_driver?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is openni_camera_driver? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "3"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called /camera/rgb/image_raw?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is /camera/rgb/image_raw? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "1"
+  },
+  {
     "level": 1,
     "category": "NODE_TYPE",
     "type": "BOOL",
@@ -53,21 +130,28 @@
     "category": "ATTACHMENT",
     "type": "OPEN",
     "question": "Which QoS policy tags are attached in node type openni_camera_driver_depth_type?",
-    "answer": "None"
+    "answer": "best_effort_qos5"
   },
   {
     "level": 1,
     "category": "ATTACHMENT",
     "type": "OPEN",
     "question": "Which non-QoS attachments are declared in node type openni_camera_driver_depth_type?",
-    "answer": "None"
+    "answer": "color_format=Grayscale"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "What is the value of attachment @color_format in node type openni_camera_driver_depth_type?",
+    "answer": "Grayscale"
   },
   {
     "level": 1,
     "category": "PUBLISH",
     "type": "OPEN",
     "question": "Which topics can node type openni_camera_driver_depth_type publish to (as declared)?",
-    "answer": "None"
+    "answer": "/camera/rgb/image_raw"
   },
   {
     "level": 1,
@@ -113,6 +197,20 @@
   },
   {
     "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type openni_camera_driver_depth_type publish to topic /camera/rgb/image_raw (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type openni_camera_driver_depth_type subscribed to topic /camera/rgb/image_raw (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
     "category": "NODE_TYPE",
     "type": "BOOL",
     "question": "Is there a ROSpec node type called custom_node_type?",
@@ -137,14 +235,21 @@
     "category": "ATTACHMENT",
     "type": "OPEN",
     "question": "Which QoS policy tags are attached in node type custom_node_type?",
-    "answer": "None"
+    "answer": "reliable_qos5"
   },
   {
     "level": 1,
     "category": "ATTACHMENT",
     "type": "OPEN",
     "question": "Which non-QoS attachments are declared in node type custom_node_type?",
-    "answer": "None"
+    "answer": "color_format=RGB8"
+  },
+  {
+    "level": 1,
+    "category": "ATTACHMENT",
+    "type": "OPEN",
+    "question": "What is the value of attachment @color_format in node type custom_node_type?",
+    "answer": "RGB8"
   },
   {
     "level": 1,
@@ -158,7 +263,7 @@
     "category": "SUBSCRIBE",
     "type": "OPEN",
     "question": "Which topics can node type custom_node_type subscribe to (as declared)?",
-    "answer": "None"
+    "answer": "/camera/rgb/image_raw"
   },
   {
     "level": 1,
@@ -197,6 +302,181 @@
   },
   {
     "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type custom_node_type publish to topic /camera/rgb/image_raw (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type custom_node_type subscribed to topic /camera/rgb/image_raw (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "NODE_INSTANCE",
+    "type": "OPEN",
+    "question": "What is the node type of node instance custom_node?",
+    "answer": "custom_node_type"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "Which parameters are assigned in node instance custom_node?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT_ASSIGN",
+    "type": "OPEN",
+    "question": "Which contexts are assigned in node instance custom_node?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "REMAP",
+    "type": "OPEN",
+    "question": "Which remaps are declared in node instance custom_node?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "To which topics can node custom_node publish (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "To which topics is node custom_node subscribed (after resolving content(...) and remaps)?",
+    "answer": "/camera/rgb/image_raw"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services does node custom_node provide (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services does node custom_node use as a client (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node custom_node publish to topic /camera/rgb/image_raw (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node custom_node subscribed to topic /camera/rgb/image_raw (after resolving content(...) and remaps)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "NODE_INSTANCE",
+    "type": "OPEN",
+    "question": "What is the node type of node instance openni_camera_driver?",
+    "answer": "openni_camera_driver_depth_type"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "Which parameters are assigned in node instance openni_camera_driver?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT_ASSIGN",
+    "type": "OPEN",
+    "question": "Which contexts are assigned in node instance openni_camera_driver?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "REMAP",
+    "type": "OPEN",
+    "question": "Which remaps are declared in node instance openni_camera_driver?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "To which topics can node openni_camera_driver publish (after resolving content(...) and remaps)?",
+    "answer": "/camera/rgb/image_raw"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "To which topics is node openni_camera_driver subscribed (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services does node openni_camera_driver provide (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services does node openni_camera_driver use as a client (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node openni_camera_driver publish to topic /camera/rgb/image_raw (after resolving content(...) and remaps)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node openni_camera_driver subscribed to topic /camera/rgb/image_raw (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "TOPIC_TYPE",
+    "type": "OPEN",
+    "question": "What is the type of topic /camera/rgb/image_raw?",
+    "answer": "sensor_msgs/Image"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "Which nodes publish to topic /camera/rgb/image_raw (after resolving content(...) and remaps)?",
+    "answer": "openni_camera_driver"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "Which nodes subscribe to topic /camera/rgb/image_raw (after resolving content(...) and remaps)?",
+    "answer": "custom_node"
+  },
+  {
+    "level": 1,
     "category": "POLICY",
     "type": "BOOL",
     "question": "Is there a policy instance called best_effort_qos5?",
@@ -229,5 +509,75 @@
     "type": "OPEN",
     "question": "What is the value of setting reliability in policy instance best_effort_qos5?",
     "answer": "BestEffort"
+  },
+  {
+    "level": 2,
+    "category": "MESSAGE",
+    "type": "BOOL",
+    "question": "Is there a communication path from node custom_node to node openni_camera_driver via a topic or service?",
+    "answer": "No"
+  },
+  {
+    "level": 2,
+    "category": "MESSAGE",
+    "type": "BOOL",
+    "question": "Is there a communication path from node openni_camera_driver to node custom_node via a topic or service?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type openni_camera_driver_depth_type publish to topic /camera/rgb/image_raw (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type openni_camera_driver_depth_type subscribed to topic /camera/rgb/image_raw (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node type custom_node_type publish to topic /camera/rgb/image_raw (as declared)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node type custom_node_type subscribed to topic /camera/rgb/image_raw (as declared)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node custom_node publish to topic /camera/rgb/image_raw (after resolving content(...) and remaps)?",
+    "answer": "No"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node custom_node subscribed to topic /camera/rgb/image_raw (after resolving content(...) and remaps)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "BOOL",
+    "question": "Does node openni_camera_driver publish to topic /camera/rgb/image_raw (after resolving content(...) and remaps)?",
+    "answer": "Yes"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "BOOL",
+    "question": "Is node openni_camera_driver subscribed to topic /camera/rgb/image_raw (after resolving content(...) and remaps)?",
+    "answer": "No"
   }
 ]

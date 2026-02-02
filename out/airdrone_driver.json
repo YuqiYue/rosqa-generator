@@ -1,5 +1,68 @@
 [
   {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called detector_xhi?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called detector_xnq?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called detector_xyh?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called driver_xhp?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called driver_xpb?",
+    "answer": "No"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called driver?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is driver? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "3"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "BOOL",
+    "question": "Is there a ROS2 entity called detector?",
+    "answer": "Yes"
+  },
+  {
+    "level": 0,
+    "category": "ENTITY",
+    "type": "MCQ",
+    "question": "What kind of ROS2 entity is detector? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+    "answer": "3"
+  },
+  {
     "level": 1,
     "category": "NODE_TYPE",
     "type": "BOOL",
@@ -67,14 +130,14 @@
     "category": "WHERE",
     "type": "BOOL",
     "question": "Does node type airdrone_driver declare a where-clause?",
-    "answer": "No"
+    "answer": "Yes"
   },
   {
     "level": 1,
     "category": "WHERE",
     "type": "OPEN",
     "question": "What is the where-clause of node type airdrone_driver?",
-    "answer": "None"
+    "answer": "altitude_max >= altitude_min;\n    tag(/front/image_raw, \"COLOR\") == \"rgb8\";"
   },
   {
     "level": 1,
@@ -166,5 +229,131 @@
     "type": "OPEN",
     "question": "What TF relations are declared in node type object_detector?",
     "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "NODE_INSTANCE",
+    "type": "OPEN",
+    "question": "What is the node type of node instance driver?",
+    "answer": "airdrone_driver"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "Which parameters are assigned in node instance driver?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT_ASSIGN",
+    "type": "OPEN",
+    "question": "Which contexts are assigned in node instance driver?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "REMAP",
+    "type": "OPEN",
+    "question": "Which remaps are declared in node instance driver?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "To which topics can node driver publish (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "To which topics is node driver subscribed (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services does node driver provide (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services does node driver use as a client (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "NODE_INSTANCE",
+    "type": "OPEN",
+    "question": "What is the node type of node instance detector?",
+    "answer": "object_detector"
+  },
+  {
+    "level": 1,
+    "category": "PARAMETER_ASSIGN",
+    "type": "OPEN",
+    "question": "Which parameters are assigned in node instance detector?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CONTEXT_ASSIGN",
+    "type": "OPEN",
+    "question": "Which contexts are assigned in node instance detector?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "REMAP",
+    "type": "OPEN",
+    "question": "Which remaps are declared in node instance detector?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "PUBLISH",
+    "type": "OPEN",
+    "question": "To which topics can node detector publish (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SUBSCRIBE",
+    "type": "OPEN",
+    "question": "To which topics is node detector subscribed (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "SERVICE",
+    "type": "OPEN",
+    "question": "Which services does node detector provide (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 1,
+    "category": "CLIENT",
+    "type": "OPEN",
+    "question": "Which services does node detector use as a client (after resolving content(...) and remaps)?",
+    "answer": "None"
+  },
+  {
+    "level": 2,
+    "category": "MESSAGE",
+    "type": "BOOL",
+    "question": "Is there a communication path from node driver to node detector via a topic or service?",
+    "answer": "No"
+  },
+  {
+    "level": 2,
+    "category": "MESSAGE",
+    "type": "BOOL",
+    "question": "Is there a communication path from node detector to node driver via a topic or service?",
+    "answer": "No"
   }
 ]

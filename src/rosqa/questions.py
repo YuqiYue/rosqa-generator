@@ -290,6 +290,40 @@ def _has_communication_path(src: str, dst: str, graph: Graph) -> bool:
 
 
 # -----------------------
+# Sampling / budgeting helpers (to control question count)
+# -----------------------
+
+def _stable_seed_from_text(text: str) -> int:
+    # Deterministic seed from a string (no external deps)
+    h = 2166136261
+    for ch in text:
+        h ^= ord(ch)
+        h = (h * 16777619) & 0xFFFFFFFF
+    return int(h)
+
+
+def _sample(items: List[str], k: int, rng: random.Random) -> List[str]:
+    if k <= 0:
+        return []
+    if len(items) <= k:
+        return list(items)
+    return rng.sample(items, k)
+
+
+def _pairs(a: List[str], b: List[str]) -> List[Tuple[str, str]]:
+    return [(x, y) for x in a for y in b]
+
+
+def _stop_if_budget(qs: List[Question], budget: Optional[int]) -> bool:
+    return budget is not None and len(qs) >= budget
+
+
+def _add(qs: List[Question], q: Question, budget: Optional[int]) -> None:
+    if budget is None or len(qs) < budget:
+        qs.append(q)
+
+
+# -----------------------
 # “Families” of questions
 # -----------------------
 
@@ -298,7 +332,17 @@ def generate_questions(
     *,
     include_negative_entities: bool = True,
     negative_entities_per_file: int = 5,
+    # New knobs to control scale
+    target_questions: Optional[int] = None,  # e.g., 200
+    seed: Optional[int] = None,              # deterministic sampling across runs
+    profile: str = "balanced",               # currently: "balanced" | "full"
 ) -> List[Question]:
+    """
+    Generate a list of Question objects.
+
+    - profile="full": generate everything (may be large)
+    - profile="balanced": cap size via sampling to ~target_questions (if provided)
+    """
     qs: List[Question] = []
 
     nodes = list(getattr(graph, "nodes", {}).values())
@@ -309,364 +353,384 @@ def generate_questions(
     type_aliases = list(getattr(graph, "type_aliases", {}).values())
     message_aliases = list(getattr(graph, "message_aliases", {}).values())
 
+    # Prepare RNG
+    if seed is None:
+        seed = _stable_seed_from_text(
+            "||".join(
+                [n.name for n in nodes]
+                + [nt.name for nt in node_types]
+                + [t.name for t in topics]
+                + [s.name for s in services]
+            )
+        )
+    rng = random.Random(seed)
+
+    # Balanced defaults if target not provided
+    if profile == "balanced" and target_questions is None:
+        target_questions = 200
+
+    # Budget slices for balanced mode (soft guidance)
+    if profile == "balanced":
+        budget_total = target_questions
+        budget_l0 = int(budget_total * 0.20)   # ~40
+        budget_nt = int(budget_total * 0.40)   # ~80
+        budget_ni = int(budget_total * 0.25)   # ~50
+        budget_l2 = budget_total - (budget_l0 + budget_nt + budget_ni)  # ~30
+    else:
+        budget_total = None
+        budget_l0 = None
+        budget_nt = None
+        budget_ni = None
+        budget_l2 = None
+
     # ------------------------------------------------------------
     # Level 0: ENTITY existence + kind (node/topic/service)
     # ------------------------------------------------------------
+    entity_names = [n.name for n in nodes] + [t.name for t in topics] + [s.name for s in services]
 
-    entity_names = (
-        [n.name for n in nodes]
-        + [t.name for t in topics]
-        + [s.name for s in services]
-    )
+    # L0 sampling: choose subset in balanced mode
+    if profile == "balanced":
+        # K entities -> 2K questions + negs
+        k_entities = max(0, (budget_l0 - max(0, negative_entities_per_file)) // 2)
+        entity_names_l0 = _sample(entity_names, k_entities, rng)
+        neg_count = min(negative_entities_per_file, max(0, budget_l0 - 2 * len(entity_names_l0)))
+    else:
+        entity_names_l0 = entity_names
+        neg_count = negative_entities_per_file if include_negative_entities else 0
 
-    if include_negative_entities:
-        for e in _generate_fake_entities(entity_names, count=negative_entities_per_file):
-            qs.append(Question(
-                level=Level.ENTITY,
-                category=Category.ENTITY,
-                qtype=QType.BOOL,
-                question=f"Is there a ROS2 entity called {e}?",
-                answer="No",
-            ))
+    if include_negative_entities and neg_count > 0:
+        for e in _generate_fake_entities(entity_names, count=neg_count):
+            _add(qs, Question(Level.ENTITY, Category.ENTITY, QType.BOOL, f"Is there a ROS2 entity called {e}?", "No"), budget_total)
 
-    for e in entity_names:
-        qs.append(Question(
-            level=Level.ENTITY,
-            category=Category.ENTITY,
-            qtype=QType.BOOL,
-            question=f"Is there a ROS2 entity called {e}?",
-            answer="Yes",
-        ))
-        qs.append(Question(
-            level=Level.ENTITY,
-            category=Category.ENTITY,
-            qtype=QType.MCQ,
-            question=(
-                f"What kind of ROS2 entity is {e}? "
-                "Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node."
+    for e in entity_names_l0:
+        _add(qs, Question(Level.ENTITY, Category.ENTITY, QType.BOOL, f"Is there a ROS2 entity called {e}?", "Yes"), budget_total)
+        _add(
+            qs,
+            Question(
+                Level.ENTITY,
+                Category.ENTITY,
+                QType.MCQ,
+                f"What kind of ROS2 entity is {e}? Possible answers: 1- ROS topic, 2- ROS service, 3- ROS node.",
+                _entity_kind(e, graph),
             ),
-            answer=_entity_kind(e, graph),
-        ))
+            budget_total,
+        )
+
+    if _stop_if_budget(qs, budget_total):
+        return qs
 
     # ------------------------------------------------------------
     # Level 1: NODE TYPE family
     # ------------------------------------------------------------
+    node_type_pool = node_types
+    if profile == "balanced":
+        # choose up to 4 node types to expand strongly
+        node_type_pool = _sample(node_types, k=min(4, len(node_types)), rng=rng)
 
-    for nt in node_types:
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.NODE_TYPE,
-            qtype=QType.BOOL,
-            question=f"Is there a ROSpec node type called {nt.name}?",
-            answer="Yes",
-        ))
+    # To generate more questions: add BOOL pairwise relations for topics/services
+    all_topic_names = sorted({t.name for t in topics})
+    all_service_names = sorted({s.name for s in services})
+
+    for nt in node_type_pool:
+        if _stop_if_budget(qs, budget_total):
+            break
+
+        _add(
+            qs,
+            Question(Level.RELATION, Category.NODE_TYPE, QType.BOOL, f"Is there a ROSpec node type called {nt.name}?", "Yes"),
+            budget_total,
+        )
 
         # Parameters (defs)
         param_defs = getattr(nt, "parameters", {}) or {}
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.PARAMETER,
-            qtype=QType.OPEN,
-            question=f"Which parameters are defined in node type {nt.name}?",
-            answer=_comma_list(param_defs.keys()),
-        ))
+        _add(
+            qs,
+            Question(Level.RELATION, Category.PARAMETER, QType.OPEN, f"Which parameters are defined in node type {nt.name}?", _comma_list(param_defs.keys())),
+            budget_total,
+        )
 
         for p in param_defs.values():
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.PARAMETER,
-                qtype=QType.OPEN,
-                question=f"What is the type of parameter {p.name} in node type {nt.name}?",
-                answer=_opt_unknown(getattr(p, "type", None)),
-            ))
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.PARAMETER,
-                qtype=QType.BOOL,
-                question=f"Is parameter {p.name} optional in node type {nt.name}?",
-                answer=_bool_yes_no(bool(getattr(p, "optional", False))),
-            ))
+            if _stop_if_budget(qs, budget_total):
+                break
+            _add(
+                qs,
+                Question(Level.RELATION, Category.PARAMETER, QType.OPEN, f"What is the type of parameter {p.name} in node type {nt.name}?", _opt_unknown(getattr(p, "type", None))),
+                budget_total,
+            )
+            _add(
+                qs,
+                Question(Level.RELATION, Category.PARAMETER, QType.BOOL, f"Is parameter {p.name} optional in node type {nt.name}?", _bool_yes_no(bool(getattr(p, "optional", False)))),
+                budget_total,
+            )
             default = getattr(p, "default", None)
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.PARAMETER,
-                qtype=QType.OPEN,
-                question=f"What is the default value of parameter {p.name} in node type {nt.name}?",
-                answer=_opt_empty(str(default)) if default is not None else _open_empty(),
-            ))
+            _add(
+                qs,
+                Question(Level.RELATION, Category.PARAMETER, QType.OPEN, f"What is the default value of parameter {p.name} in node type {nt.name}?", _opt_empty(default)),
+                budget_total,
+            )
             constraint = getattr(p, "constraint", None)
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.WHERE,
-                qtype=QType.BOOL,
-                question=f"Does parameter {p.name} in node type {nt.name} have a constraint?",
-                answer=_bool_yes_no(bool(constraint)),
-            ))
+            _add(
+                qs,
+                Question(Level.RELATION, Category.WHERE, QType.BOOL, f"Does parameter {p.name} in node type {nt.name} have a constraint?", _bool_yes_no(bool(constraint))),
+                budget_total,
+            )
             if constraint:
-                qs.append(Question(
-                    level=Level.RELATION,
-                    category=Category.WHERE,
-                    qtype=QType.OPEN,
-                    question=f"What is the constraint of parameter {p.name} in node type {nt.name}?",
-                    answer=str(constraint).strip() or _open_empty(),
-                ))
+                _add(
+                    qs,
+                    Question(Level.RELATION, Category.WHERE, QType.OPEN, f"What is the constraint of parameter {p.name} in node type {nt.name}?", str(constraint).strip() or _open_empty()),
+                    budget_total,
+                )
 
         # Contexts (defs)
         ctx_defs = getattr(nt, "contexts", {}) or {}
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.CONTEXT,
-            qtype=QType.OPEN,
-            question=f"Which contexts are defined in node type {nt.name}?",
-            answer=_comma_list(ctx_defs.keys()),
-        ))
+        _add(
+            qs,
+            Question(Level.RELATION, Category.CONTEXT, QType.OPEN, f"Which contexts are defined in node type {nt.name}?", _comma_list(ctx_defs.keys())),
+            budget_total,
+        )
         for c in ctx_defs.values():
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.CONTEXT,
-                qtype=QType.OPEN,
-                question=f"What is the type of context {c.name} in node type {nt.name}?",
-                answer=_opt_unknown(getattr(c, "type", None)),
-            ))
+            if _stop_if_budget(qs, budget_total):
+                break
+            _add(
+                qs,
+                Question(Level.RELATION, Category.CONTEXT, QType.OPEN, f"What is the type of context {c.name} in node type {nt.name}?", _opt_unknown(getattr(c, "type", None))),
+                budget_total,
+            )
 
-        # Attachments (qos + other)
+        # Attachments
         qos_att = sorted(getattr(nt, "qos_attachments", set()) or set())
         other_att = getattr(nt, "other_attachments", {}) or {}
 
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.ATTACHMENT,
-            qtype=QType.OPEN,
-            question=f"Which QoS policy tags are attached in node type {nt.name}?",
-            answer=_comma_list(qos_att),
-        ))
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.ATTACHMENT,
-            qtype=QType.OPEN,
-            question=f"Which non-QoS attachments are declared in node type {nt.name}?",
-            answer=_comma_list([f"{k}={v}" for k, v in other_att.items()]),
-        ))
+        _add(
+            qs,
+            Question(Level.RELATION, Category.ATTACHMENT, QType.OPEN, f"Which QoS policy tags are attached in node type {nt.name}?", _comma_list(qos_att)),
+            budget_total,
+        )
+        _add(
+            qs,
+            Question(Level.RELATION, Category.ATTACHMENT, QType.OPEN, f"Which non-QoS attachments are declared in node type {nt.name}?", _comma_list([f"{k}={v}" for k, v in other_att.items()])),
+            budget_total,
+        )
         for k, v in other_att.items():
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.ATTACHMENT,
-                qtype=QType.OPEN,
-                question=f"What is the value of attachment @{k} in node type {nt.name}?",
-                answer=str(v).strip() or _open_empty(),
-            ))
+            if _stop_if_budget(qs, budget_total):
+                break
+            _add(
+                qs,
+                Question(Level.RELATION, Category.ATTACHMENT, QType.OPEN, f"What is the value of attachment @{k} in node type {nt.name}?", str(v).strip() or _open_empty()),
+                budget_total,
+            )
 
-        # Connections declared at type level (raw names, may include content(...))
+        # Declared connections OPEN summaries
         pubs = [name for (name, _t) in (getattr(nt, "publishes", set()) or set())]
         subs = [name for (name, _t) in (getattr(nt, "subscribes", set()) or set())]
         prov = [name for (name, _t) in (getattr(nt, "provides", set()) or set())]
         uses = [name for (name, _t) in (getattr(nt, "uses", set()) or set())]
         consumes_content = list(getattr(nt, "consumes_content_services", set()) or set())
 
-        qs.append(Question(
-            Level.RELATION,
-            Category.PUBLISH,
-            QType.OPEN,
-            f"Which topics can node type {nt.name} publish to (as declared)?",
-            _comma_list(pubs),
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.SUBSCRIBE,
-            QType.OPEN,
-            f"Which topics can node type {nt.name} subscribe to (as declared)?",
-            _comma_list(subs),
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.SERVICE,
-            QType.OPEN,
-            f"Which services can node type {nt.name} provide (as declared)?",
-            _comma_list(prov),
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.CLIENT,
-            QType.OPEN,
-            f"Which services can node type {nt.name} use (as declared)?",
-            _comma_list(uses),
-        ))
+        _add(qs, Question(Level.RELATION, Category.PUBLISH, QType.OPEN, f"Which topics can node type {nt.name} publish to (as declared)?", _comma_list(pubs)), budget_total)
+        _add(qs, Question(Level.RELATION, Category.SUBSCRIBE, QType.OPEN, f"Which topics can node type {nt.name} subscribe to (as declared)?", _comma_list(subs)), budget_total)
+        _add(qs, Question(Level.RELATION, Category.SERVICE, QType.OPEN, f"Which services can node type {nt.name} provide (as declared)?", _comma_list(prov)), budget_total)
+        _add(qs, Question(Level.RELATION, Category.CLIENT, QType.OPEN, f"Which services can node type {nt.name} use (as declared)?", _comma_list(uses)), budget_total)
 
-        # where block at end of node type (optional)
+        # Where block
         where_block = getattr(nt, "where_block", None)
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.WHERE,
-            qtype=QType.BOOL,
-            question=f"Does node type {nt.name} declare a where-clause?",
-            answer=_bool_yes_no(bool(where_block)),
-        ))
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.WHERE,
-            qtype=QType.OPEN,
-            question=f"What is the where-clause of node type {nt.name}?",
-            answer=_opt_empty(where_block),
-        ))
+        _add(
+            qs,
+            Question(Level.RELATION, Category.WHERE, QType.BOOL, f"Does node type {nt.name} declare a where-clause?", _bool_yes_no(bool(where_block))),
+            budget_total,
+        )
+        _add(
+            qs,
+            Question(Level.RELATION, Category.WHERE, QType.OPEN, f"What is the where-clause of node type {nt.name}?", _opt_empty(where_block)),
+            budget_total,
+        )
 
-        # content(service_param) declarations (unresolved until instance time)
+        # content(...) declarations
         for (_ph, param_name, srv_type) in consumes_content:
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.CONTENT_SERVICE,
-                qtype=QType.OPEN,
-                question=f"Which parameter provides the consumed service name via content(...) in node type {nt.name}?",
-                answer=str(param_name).strip() or _open_unknown(),
-            ))
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.CONTENT_SERVICE,
-                qtype=QType.OPEN,
-                question=f"What is the declared type of the consumed content-based service in node type {nt.name}?",
-                answer=_opt_unknown(srv_type),
-            ))
+            if _stop_if_budget(qs, budget_total):
+                break
+            _add(
+                qs,
+                Question(Level.RELATION, Category.CONTENT_SERVICE, QType.OPEN, f"Which parameter provides the consumed service name via content(...) in node type {nt.name}?", str(param_name).strip() or _open_unknown()),
+                budget_total,
+            )
+            _add(
+                qs,
+                Question(Level.RELATION, Category.CONTENT_SERVICE, QType.OPEN, f"What is the declared type of the consumed content-based service in node type {nt.name}?", _opt_unknown(srv_type)),
+                budget_total,
+            )
 
         # TF edges
         tf_edges = getattr(nt, "tf_edges", []) or []
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.TF,
-            qtype=QType.OPEN,
-            question=f"What TF relations are declared in node type {nt.name}?",
-            answer=_comma_list([f"{e.relation} {e.frm}->{e.to}" for e in tf_edges]),
-        ))
+        _add(
+            qs,
+            Question(Level.RELATION, Category.TF, QType.OPEN, f"What TF relations are declared in node type {nt.name}?", _comma_list([f"{e.relation} {e.frm}->{e.to}" for e in tf_edges])),
+            budget_total,
+        )
+
+        # Extra BOOL expansion (balanced mode)
+        if profile == "balanced":
+            declared_pub = set(pubs)
+            declared_sub = set(subs)
+            declared_prov = set(prov)
+            declared_use = set(uses)
+
+            pub_samples = _sample(all_topic_names, k=8, rng=rng)
+            sub_samples = _sample(all_topic_names, k=8, rng=rng)
+            prov_samples = _sample(all_service_names, k=4, rng=rng)
+            use_samples = _sample(all_service_names, k=4, rng=rng)
+
+            for tname in pub_samples:
+                if _stop_if_budget(qs, budget_total):
+                    break
+                _add(
+                    qs,
+                    Question(Level.RELATION, Category.PUBLISH, QType.BOOL, f"Does node type {nt.name} publish to topic {tname} (as declared)?", _bool_yes_no(tname in declared_pub)),
+                    budget_total,
+                )
+            for tname in sub_samples:
+                if _stop_if_budget(qs, budget_total):
+                    break
+                _add(
+                    qs,
+                    Question(Level.RELATION, Category.SUBSCRIBE, QType.BOOL, f"Is node type {nt.name} subscribed to topic {tname} (as declared)?", _bool_yes_no(tname in declared_sub)),
+                    budget_total,
+                )
+            for sname in prov_samples:
+                if _stop_if_budget(qs, budget_total):
+                    break
+                _add(
+                    qs,
+                    Question(Level.RELATION, Category.SERVICE, QType.BOOL, f"Does node type {nt.name} provide service {sname} (as declared)?", _bool_yes_no(sname in declared_prov)),
+                    budget_total,
+                )
+            for sname in use_samples:
+                if _stop_if_budget(qs, budget_total):
+                    break
+                _add(
+                    qs,
+                    Question(Level.RELATION, Category.CLIENT, QType.BOOL, f"Does node type {nt.name} use service {sname} as a client (as declared)?", _bool_yes_no(sname in declared_use)),
+                    budget_total,
+                )
+
+    if _stop_if_budget(qs, budget_total):
+        return qs
 
     # ------------------------------------------------------------
     # Level 1: NODE INSTANCE family
     # ------------------------------------------------------------
+    node_instance_pool = nodes
+    if profile == "balanced":
+        node_instance_pool = _sample(nodes, k=min(3, len(nodes)), rng=rng)
 
-    for n in nodes:
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.NODE_INSTANCE,
-            qtype=QType.OPEN,
-            question=f"What is the node type of node instance {n.name}?",
-            answer=_opt_unknown(getattr(getattr(n, "node_type", None), "name", None)),
-        ))
+    for n in node_instance_pool:
+        if _stop_if_budget(qs, budget_total):
+            break
+
+        _add(
+            qs,
+            Question(Level.RELATION, Category.NODE_INSTANCE, QType.OPEN, f"What is the node type of node instance {n.name}?", _opt_unknown(getattr(getattr(n, "node_type", None), "name", None))),
+            budget_total,
+        )
 
         assigns = getattr(n, "param_assigns", {}) or {}
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.PARAMETER_ASSIGN,
-            qtype=QType.OPEN,
-            question=f"Which parameters are assigned in node instance {n.name}?",
-            answer=_comma_list(assigns.keys()),
-        ))
+        _add(qs, Question(Level.RELATION, Category.PARAMETER_ASSIGN, QType.OPEN, f"Which parameters are assigned in node instance {n.name}?", _comma_list(assigns.keys())), budget_total)
         for k, v in assigns.items():
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.PARAMETER_ASSIGN,
-                qtype=QType.OPEN,
-                question=f"What value is assigned to parameter {k} in node instance {n.name}?",
-                answer=_strip_quotes(v.value) if v and getattr(v, "value", None) is not None else _open_unknown(),
-            ))
+            if _stop_if_budget(qs, budget_total):
+                break
+            _add(
+                qs,
+                Question(Level.RELATION, Category.PARAMETER_ASSIGN, QType.OPEN, f"What value is assigned to parameter {k} in node instance {n.name}?", _strip_quotes(v.value) if v and getattr(v, "value", None) is not None else _open_unknown()),
+                budget_total,
+            )
 
         cassigns = getattr(n, "context_assigns", {}) or {}
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.CONTEXT_ASSIGN,
-            qtype=QType.OPEN,
-            question=f"Which contexts are assigned in node instance {n.name}?",
-            answer=_comma_list(cassigns.keys()),
-        ))
+        _add(qs, Question(Level.RELATION, Category.CONTEXT_ASSIGN, QType.OPEN, f"Which contexts are assigned in node instance {n.name}?", _comma_list(cassigns.keys())), budget_total)
         for k, v in cassigns.items():
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.CONTEXT_ASSIGN,
-                qtype=QType.OPEN,
-                question=f"What value is assigned to context {k} in node instance {n.name}?",
-                answer=_strip_quotes(v.value) if v and getattr(v, "value", None) is not None else _open_unknown(),
-            ))
+            if _stop_if_budget(qs, budget_total):
+                break
+            _add(
+                qs,
+                Question(Level.RELATION, Category.CONTEXT_ASSIGN, QType.OPEN, f"What value is assigned to context {k} in node instance {n.name}?", _strip_quotes(v.value) if v and getattr(v, "value", None) is not None else _open_unknown()),
+                budget_total,
+            )
 
         remaps = getattr(n, "remaps", []) or []
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.REMAP,
-            qtype=QType.OPEN,
-            question=f"Which remaps are declared in node instance {n.name}?",
-            answer=_comma_list([f"{r.frm}->{r.to}" for r in remaps]),
-        ))
+        _add(qs, Question(Level.RELATION, Category.REMAP, QType.OPEN, f"Which remaps are declared in node instance {n.name}?", _comma_list([f"{r.frm}->{r.to}" for r in remaps])), budget_total)
         for r in remaps:
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.REMAP,
-                qtype=QType.BOOL,
-                question=f"Does node instance {n.name} remap {r.frm} to {r.to}?",
-                answer="Yes",
-            ))
+            if _stop_if_budget(qs, budget_total):
+                break
+            _add(qs, Question(Level.RELATION, Category.REMAP, QType.BOOL, f"Does node instance {n.name} remap {r.frm} to {r.to}?", "Yes"), budget_total)
 
-        qs.append(Question(
-            Level.RELATION,
-            Category.PUBLISH,
-            QType.OPEN,
-            f"To which topics can node {n.name} publish (after resolving content(...) and remaps)?",
-            _comma_list(_effective_publishes(n)),
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.SUBSCRIBE,
-            QType.OPEN,
-            f"To which topics is node {n.name} subscribed (after resolving content(...) and remaps)?",
-            _comma_list(_effective_subscribes(n)),
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.SERVICE,
-            QType.OPEN,
-            f"Which services does node {n.name} provide (after resolving content(...) and remaps)?",
-            _comma_list(_effective_provides(n)),
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.CLIENT,
-            QType.OPEN,
-            f"Which services does node {n.name} use as a client (after resolving content(...) and remaps)?",
-            _comma_list(_effective_uses(n)),
-        ))
+        # Effective resolved connections (OPEN)
+        eff_pub = _effective_publishes(n)
+        eff_sub = _effective_subscribes(n)
+        eff_prov = _effective_provides(n)
+        eff_use = _effective_uses(n)
 
+        _add(qs, Question(Level.RELATION, Category.PUBLISH, QType.OPEN, f"To which topics can node {n.name} publish (after resolving content(...) and remaps)?", _comma_list(eff_pub)), budget_total)
+        _add(qs, Question(Level.RELATION, Category.SUBSCRIBE, QType.OPEN, f"To which topics is node {n.name} subscribed (after resolving content(...) and remaps)?", _comma_list(eff_sub)), budget_total)
+        _add(qs, Question(Level.RELATION, Category.SERVICE, QType.OPEN, f"Which services does node {n.name} provide (after resolving content(...) and remaps)?", _comma_list(eff_prov)), budget_total)
+        _add(qs, Question(Level.RELATION, Category.CLIENT, QType.OPEN, f"Which services does node {n.name} use as a client (after resolving content(...) and remaps)?", _comma_list(eff_use)), budget_total)
+
+        # Extra BOOL expansion for instances (balanced)
+        if profile == "balanced":
+            pub_samples = _sample(all_topic_names, k=6, rng=rng)
+            sub_samples = _sample(all_topic_names, k=6, rng=rng)
+            prov_samples = _sample(all_service_names, k=3, rng=rng)
+            use_samples = _sample(all_service_names, k=3, rng=rng)
+
+            for tname in pub_samples:
+                if _stop_if_budget(qs, budget_total):
+                    break
+                _add(qs, Question(Level.RELATION, Category.PUBLISH, QType.BOOL, f"Does node {n.name} publish to topic {tname} (after resolving content(...) and remaps)?", _bool_yes_no(tname in eff_pub)), budget_total)
+            for tname in sub_samples:
+                if _stop_if_budget(qs, budget_total):
+                    break
+                _add(qs, Question(Level.RELATION, Category.SUBSCRIBE, QType.BOOL, f"Is node {n.name} subscribed to topic {tname} (after resolving content(...) and remaps)?", _bool_yes_no(tname in eff_sub)), budget_total)
+            for sname in prov_samples:
+                if _stop_if_budget(qs, budget_total):
+                    break
+                _add(qs, Question(Level.RELATION, Category.SERVICE, QType.BOOL, f"Does node {n.name} provide service {sname} (after resolving content(...) and remaps)?", _bool_yes_no(sname in eff_prov)), budget_total)
+            for sname in use_samples:
+                if _stop_if_budget(qs, budget_total):
+                    break
+                _add(qs, Question(Level.RELATION, Category.CLIENT, QType.BOOL, f"Does node {n.name} use service {sname} as a client (after resolving content(...) and remaps)?", _bool_yes_no(sname in eff_use)), budget_total)
+
+        # Content-service resolution questions
         for (_ph, param_name, srv_type) in getattr(n.node_type, "consumes_content_services", set()) or set():
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.CONTENT_SERVICE,
-                qtype=QType.BOOL,
-                question=f"Does node {n.name} consume a service whose name is provided by parameter {param_name}?",
-                answer="Yes",
-            ))
+            if _stop_if_budget(qs, budget_total):
+                break
+            _add(
+                qs,
+                Question(Level.RELATION, Category.CONTENT_SERVICE, QType.BOOL, f"Does node {n.name} consume a service whose name is provided by parameter {param_name}?", "Yes"),
+                budget_total,
+            )
             assigned = param_name in assigns
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.CONTENT_SERVICE,
-                qtype=QType.BOOL,
-                question=f"Is parameter {param_name} assigned in node instance {n.name} for resolving the consumed service name?",
-                answer=_bool_yes_no(assigned),
-            ))
+            _add(
+                qs,
+                Question(Level.RELATION, Category.CONTENT_SERVICE, QType.BOOL, f"Is parameter {param_name} assigned in node instance {n.name} for resolving the consumed service name?", _bool_yes_no(assigned)),
+                budget_total,
+            )
             if assigned:
-                resolved_name = _strip_quotes(assigns[param_name].value)
-                resolved_name = _apply_remaps(resolved_name, n)
-                qs.append(Question(
-                    level=Level.RELATION,
-                    category=Category.CONTENT_SERVICE,
-                    qtype=QType.OPEN,
-                    question=f"What is the resolved consumed service name for node {n.name} (via parameter {param_name})?",
-                    answer=resolved_name or _open_unknown(),
-                ))
-                qs.append(Question(
-                    level=Level.RELATION,
-                    category=Category.CONTENT_SERVICE,
-                    qtype=QType.OPEN,
-                    question=f"What is the declared type of the consumed service resolved via parameter {param_name} in node {n.name}?",
-                    answer=_opt_unknown(srv_type),
-                ))
+                resolved_name = _apply_remaps(_strip_quotes(assigns[param_name].value), n)
+                _add(
+                    qs,
+                    Question(Level.RELATION, Category.CONTENT_SERVICE, QType.OPEN, f"What is the resolved consumed service name for node {n.name} (via parameter {param_name})?", resolved_name or _open_unknown()),
+                    budget_total,
+                )
+                _add(
+                    qs,
+                    Question(Level.RELATION, Category.CONTENT_SERVICE, QType.OPEN, f"What is the declared type of the consumed service resolved via parameter {param_name} in node {n.name}?", _opt_unknown(srv_type)),
+                    budget_total,
+                )
+
+    if _stop_if_budget(qs, budget_total):
+        return qs
 
     # ------------------------------------------------------------
     # Level 1: TOPIC family
     # ------------------------------------------------------------
-
     topic_publishers: Dict[str, Set[str]] = {}
     topic_subscribers: Dict[str, Set[str]] = {}
 
@@ -677,32 +741,15 @@ def generate_questions(
             topic_subscribers.setdefault(tname, set()).add(n.name)
 
     for t in topics:
-        qs.append(Question(
-            Level.RELATION,
-            Category.TOPIC_TYPE,
-            QType.OPEN,
-            f"What is the type of topic {t.name}?",
-            _opt_unknown(getattr(t, "type", None)),
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.PUBLISH,
-            QType.OPEN,
-            f"Which nodes publish to topic {t.name} (after resolving content(...) and remaps)?",
-            _comma_list(topic_publishers.get(t.name, set())),
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.SUBSCRIBE,
-            QType.OPEN,
-            f"Which nodes subscribe to topic {t.name} (after resolving content(...) and remaps)?",
-            _comma_list(topic_subscribers.get(t.name, set())),
-        ))
+        if _stop_if_budget(qs, budget_total):
+            break
+        _add(qs, Question(Level.RELATION, Category.TOPIC_TYPE, QType.OPEN, f"What is the type of topic {t.name}?", _opt_unknown(getattr(t, "type", None))), budget_total)
+        _add(qs, Question(Level.RELATION, Category.PUBLISH, QType.OPEN, f"Which nodes publish to topic {t.name} (after resolving content(...) and remaps)?", _comma_list(topic_publishers.get(t.name, set()))), budget_total)
+        _add(qs, Question(Level.RELATION, Category.SUBSCRIBE, QType.OPEN, f"Which nodes subscribe to topic {t.name} (after resolving content(...) and remaps)?", _comma_list(topic_subscribers.get(t.name, set()))), budget_total)
 
     # ------------------------------------------------------------
     # Level 1: SERVICE family
     # ------------------------------------------------------------
-
     service_providers: Dict[str, Set[str]] = {}
     service_clients: Dict[str, Set[str]] = {}
 
@@ -715,137 +762,141 @@ def generate_questions(
             service_clients.setdefault(sname, set()).add(n.name)
 
     for s in services:
-        qs.append(Question(
-            Level.RELATION,
-            Category.SERVICE_TYPE,
-            QType.OPEN,
-            f"What is the type of service {s.name}?",
-            _opt_unknown(getattr(s, "type", None)),
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.SERVICE,
-            QType.OPEN,
-            f"Which nodes provide service {s.name} (after resolving content(...) and remaps)?",
-            _comma_list(service_providers.get(s.name, set())),
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.CLIENT,
-            QType.OPEN,
-            f"Which nodes use service {s.name} as a client (after resolving content(...) and remaps)?",
-            _comma_list(service_clients.get(s.name, set())),
-        ))
+        if _stop_if_budget(qs, budget_total):
+            break
+        _add(qs, Question(Level.RELATION, Category.SERVICE_TYPE, QType.OPEN, f"What is the type of service {s.name}?", _opt_unknown(getattr(s, "type", None))), budget_total)
+        _add(qs, Question(Level.RELATION, Category.SERVICE, QType.OPEN, f"Which nodes provide service {s.name} (after resolving content(...) and remaps)?", _comma_list(service_providers.get(s.name, set()))), budget_total)
+        _add(qs, Question(Level.RELATION, Category.CLIENT, QType.OPEN, f"Which nodes use service {s.name} as a client (after resolving content(...) and remaps)?", _comma_list(service_clients.get(s.name, set()))), budget_total)
 
     # ------------------------------------------------------------
     # Level 1: POLICY family
     # ------------------------------------------------------------
-
     for p in qos_policies:
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.POLICY,
-            qtype=QType.BOOL,
-            question=f"Is there a policy instance called {p.name}?",
-            answer="Yes",
-        ))
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.POLICY,
-            qtype=QType.OPEN,
-            question=f"What is the kind of policy instance {p.name}?",
-            answer=_opt_unknown(getattr(p, "kind", None)),
-        ))
+        if _stop_if_budget(qs, budget_total):
+            break
+        _add(qs, Question(Level.RELATION, Category.POLICY, QType.BOOL, f"Is there a policy instance called {p.name}?", "Yes"), budget_total)
+        _add(qs, Question(Level.RELATION, Category.POLICY, QType.OPEN, f"What is the kind of policy instance {p.name}?", _opt_unknown(getattr(p, "kind", None))), budget_total)
         settings = getattr(p, "settings", {}) or {}
-        qs.append(Question(
-            level=Level.RELATION,
-            category=Category.POLICY,
-            qtype=QType.OPEN,
-            question=f"What settings are defined in policy instance {p.name}?",
-            answer=_comma_list([f"{k}={v}" for k, v in settings.items()]),
-        ))
+        _add(qs, Question(Level.RELATION, Category.POLICY, QType.OPEN, f"What settings are defined in policy instance {p.name}?", _comma_list([f"{k}={v}" for k, v in settings.items()])), budget_total)
         for k, v in settings.items():
-            qs.append(Question(
-                level=Level.RELATION,
-                category=Category.POLICY,
-                qtype=QType.OPEN,
-                question=f"What is the value of setting {k} in policy instance {p.name}?",
-                answer=str(v).strip() or _open_unknown(),
-            ))
+            if _stop_if_budget(qs, budget_total):
+                break
+            _add(qs, Question(Level.RELATION, Category.POLICY, QType.OPEN, f"What is the value of setting {k} in policy instance {p.name}?", str(v).strip() or _open_unknown()), budget_total)
 
     # ------------------------------------------------------------
     # Level 1: TYPE ALIAS family
     # ------------------------------------------------------------
-
     for a in type_aliases:
-        qs.append(Question(
-            Level.RELATION,
-            Category.TYPE_ALIAS,
-            QType.BOOL,
-            f"Is there a type alias called {a.name}?",
-            "Yes",
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.TYPE_ALIAS,
-            QType.OPEN,
-            f"What is the definition of type alias {a.name}?",
-            _opt_unknown(getattr(a, "definition", None)),
-        ))
+        if _stop_if_budget(qs, budget_total):
+            break
+        _add(qs, Question(Level.RELATION, Category.TYPE_ALIAS, QType.BOOL, f"Is there a type alias called {a.name}?", "Yes"), budget_total)
+        _add(qs, Question(Level.RELATION, Category.TYPE_ALIAS, QType.OPEN, f"What is the definition of type alias {a.name}?", _opt_unknown(getattr(a, "definition", None))), budget_total)
 
     # ------------------------------------------------------------
     # Level 1: MESSAGE ALIAS + FIELD family
     # ------------------------------------------------------------
-
     for m in message_aliases:
-        qs.append(Question(
-            Level.RELATION,
-            Category.MESSAGE_ALIAS,
-            QType.BOOL,
-            f"Is there a message alias called {m.name}?",
-            "Yes",
-        ))
-        qs.append(Question(
-            Level.RELATION,
-            Category.MESSAGE_ALIAS,
-            QType.OPEN,
-            f"What is the base message type of message alias {m.name}?",
-            _opt_unknown(getattr(m, "base_type", None)),
-        ))
+        if _stop_if_budget(qs, budget_total):
+            break
+        _add(qs, Question(Level.RELATION, Category.MESSAGE_ALIAS, QType.BOOL, f"Is there a message alias called {m.name}?", "Yes"), budget_total)
+        _add(qs, Question(Level.RELATION, Category.MESSAGE_ALIAS, QType.OPEN, f"What is the base message type of message alias {m.name}?", _opt_unknown(getattr(m, "base_type", None))), budget_total)
         fields = getattr(m, "fields", []) or []
-        qs.append(Question(
-            Level.RELATION,
-            Category.MESSAGE_FIELD,
-            QType.OPEN,
-            f"Which fields are defined in message alias {m.name}?",
-            _comma_list([getattr(f, "name", "") for f in fields]),
-        ))
+        _add(qs, Question(Level.RELATION, Category.MESSAGE_FIELD, QType.OPEN, f"Which fields are defined in message alias {m.name}?", _comma_list([getattr(f, 'name', '') for f in fields])), budget_total)
         for f in fields:
-            qs.append(Question(
-                Level.RELATION,
-                Category.MESSAGE_FIELD,
-                QType.OPEN,
-                f"What is the type of field {getattr(f, 'name', '')} in message alias {m.name}?",
-                _opt_unknown(getattr(f, "type", None)),
-            ))
+            if _stop_if_budget(qs, budget_total):
+                break
+            _add(qs, Question(Level.RELATION, Category.MESSAGE_FIELD, QType.OPEN, f"What is the type of field {getattr(f, 'name', '')} in message alias {m.name}?", _opt_unknown(getattr(f, "type", None))), budget_total)
+
+    if _stop_if_budget(qs, budget_total):
+        return qs
 
     # ------------------------------------------------------------
     # Level 2: PATH questions
     # ------------------------------------------------------------
+    if profile == "balanced":
+        # sample path pairs
+        node_names = [n.name for n in nodes]
+        pairs = [(a, b) for a in node_names for b in node_names if a != b]
+        pairs = _sample(pairs, k=min(budget_l2, len(pairs)), rng=rng) if budget_l2 is not None else pairs
+        for (src, dst) in pairs:
+            if _stop_if_budget(qs, budget_total):
+                break
+            _add(
+                qs,
+                Question(Level.PATH, Category.MESSAGE, QType.BOOL, f"Is there a communication path from node {src} to node {dst} via a topic or service?", _bool_yes_no(_has_communication_path(src, dst, graph))),
+                budget_total,
+            )
+    else:
+        for src in nodes:
+            for dst in nodes:
+                if src.name == dst.name:
+                    continue
+                if _stop_if_budget(qs, budget_total):
+                    break
+                _add(
+                    qs,
+                    Question(Level.PATH, Category.MESSAGE, QType.BOOL, f"Is there a communication path from node {src.name} to node {dst.name} via a topic or service?", _bool_yes_no(_has_communication_path(src.name, dst.name, graph))),
+                    budget_total,
+                )
 
-    for src in nodes:
-        for dst in nodes:
-            if src.name == dst.name:
-                continue
-            qs.append(Question(
-                level=Level.PATH,
-                category=Category.MESSAGE,
-                qtype=QType.BOOL,
-                question=(
-                    f"Is there a communication path from node {src.name} "
-                    f"to node {dst.name} via a topic or service?"
-                ),
-                answer=_bool_yes_no(_has_communication_path(src.name, dst.name, graph)),
-            ))
+    # If balanced and we still didn't reach target, top up with negative relation BOOLs
+    if profile == "balanced" and budget_total is not None and len(qs) < budget_total:
+        # Fill remaining with random negative-ish relations
+        node_type_names = [nt.name for nt in node_types]
+        node_inst_names = [n.name for n in nodes]
+        remaining = budget_total - len(qs)
+
+        # Prepare candidate (subject, kind, object) tuples
+        candidates: List[Tuple[str, str, str]] = []
+        for nt in node_type_names:
+            for t in all_topic_names:
+                candidates.append((nt, "NT_PUB", t))
+                candidates.append((nt, "NT_SUB", t))
+            for s in all_service_names:
+                candidates.append((nt, "NT_PROV", s))
+                candidates.append((nt, "NT_USE", s))
+        for ni in node_inst_names:
+            for t in all_topic_names:
+                candidates.append((ni, "N_PUB", t))
+                candidates.append((ni, "N_SUB", t))
+            for s in all_service_names:
+                candidates.append((ni, "N_PROV", s))
+                candidates.append((ni, "N_USE", s))
+
+        for (subj, kind, obj) in _sample(candidates, k=min(remaining, len(candidates)), rng=rng):
+            if _stop_if_budget(qs, budget_total):
+                break
+            if kind == "NT_PUB":
+                nt = next((x for x in node_types if x.name == subj), None)
+                declared = {name for (name, _t) in (getattr(nt, "publishes", set()) or set())} if nt else set()
+                _add(qs, Question(Level.RELATION, Category.PUBLISH, QType.BOOL, f"Does node type {subj} publish to topic {obj} (as declared)?", _bool_yes_no(obj in declared)), budget_total)
+            elif kind == "NT_SUB":
+                nt = next((x for x in node_types if x.name == subj), None)
+                declared = {name for (name, _t) in (getattr(nt, "subscribes", set()) or set())} if nt else set()
+                _add(qs, Question(Level.RELATION, Category.SUBSCRIBE, QType.BOOL, f"Is node type {subj} subscribed to topic {obj} (as declared)?", _bool_yes_no(obj in declared)), budget_total)
+            elif kind == "NT_PROV":
+                nt = next((x for x in node_types if x.name == subj), None)
+                declared = {name for (name, _t) in (getattr(nt, "provides", set()) or set())} if nt else set()
+                _add(qs, Question(Level.RELATION, Category.SERVICE, QType.BOOL, f"Does node type {subj} provide service {obj} (as declared)?", _bool_yes_no(obj in declared)), budget_total)
+            elif kind == "NT_USE":
+                nt = next((x for x in node_types if x.name == subj), None)
+                declared = {name for (name, _t) in (getattr(nt, "uses", set()) or set())} if nt else set()
+                _add(qs, Question(Level.RELATION, Category.CLIENT, QType.BOOL, f"Does node type {subj} use service {obj} as a client (as declared)?", _bool_yes_no(obj in declared)), budget_total)
+            elif kind == "N_PUB":
+                n = next((x for x in nodes if x.name == subj), None)
+                eff = _effective_publishes(n) if n else set()
+                _add(qs, Question(Level.RELATION, Category.PUBLISH, QType.BOOL, f"Does node {subj} publish to topic {obj} (after resolving content(...) and remaps)?", _bool_yes_no(obj in eff)), budget_total)
+            elif kind == "N_SUB":
+                n = next((x for x in nodes if x.name == subj), None)
+                eff = _effective_subscribes(n) if n else set()
+                _add(qs, Question(Level.RELATION, Category.SUBSCRIBE, QType.BOOL, f"Is node {subj} subscribed to topic {obj} (after resolving content(...) and remaps)?", _bool_yes_no(obj in eff)), budget_total)
+            elif kind == "N_PROV":
+                n = next((x for x in nodes if x.name == subj), None)
+                eff = _effective_provides(n) if n else set()
+                _add(qs, Question(Level.RELATION, Category.SERVICE, QType.BOOL, f"Does node {subj} provide service {obj} (after resolving content(...) and remaps)?", _bool_yes_no(obj in eff)), budget_total)
+            elif kind == "N_USE":
+                n = next((x for x in nodes if x.name == subj), None)
+                eff = _effective_uses(n) if n else set()
+                _add(qs, Question(Level.RELATION, Category.CLIENT, QType.BOOL, f"Does node {subj} use service {obj} as a client (after resolving content(...) and remaps)?", _bool_yes_no(obj in eff)), budget_total)
 
     return qs
